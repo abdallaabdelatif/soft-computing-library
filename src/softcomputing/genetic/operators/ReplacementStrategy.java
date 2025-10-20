@@ -1,4 +1,4 @@
 package softcomputing.genetic.operators;
 
-public interface ReplacementStrategy {
+public interface ReplacementStrategy <T>{
 }

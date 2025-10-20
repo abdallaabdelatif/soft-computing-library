@@ -1,4 +1,7 @@
 package softcomputing.genetic.fitness;
 
-public interface FitnessFunction {
+import softcomputing.genetic.chromosome.Chromosome;
+
+public interface FitnessFunction <T>{
+    double evaluate(Chromosome<Integer> chromosome);
 }

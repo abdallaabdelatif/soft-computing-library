@@ -1,4 +1,4 @@
 package softcomputing.genetic.operators;
 
-public interface CrossoverStrategy {
+public interface CrossoverStrategy <T>{
 }

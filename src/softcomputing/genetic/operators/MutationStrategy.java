@@ -1,4 +1,4 @@
 package softcomputing.genetic.operators;
 
-public interface MutationStrategy {
+public interface MutationStrategy <T>{
 }

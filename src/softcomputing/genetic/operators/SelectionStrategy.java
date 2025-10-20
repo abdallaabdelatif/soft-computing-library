@@ -1,4 +1,4 @@
 package softcomputing.genetic.operators;
 
-public interface SelectionStrategy {
+public interface SelectionStrategy <T>{
 }
