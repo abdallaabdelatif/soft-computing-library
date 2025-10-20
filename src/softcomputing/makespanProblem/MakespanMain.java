@@ -72,8 +72,8 @@ public class MakespanMain {
         //=============================================================
         System.out.println("Choose crossover method:");
         System.out.println("1. Single Point");
-        System.out.println("2. Two Point");
-        System.out.println("3. Arithmetic");
+        System.out.println("2. N point");
+        System.out.println("3. Uniform");
         int crossChoice = sc.nextInt();
 
 
@@ -82,10 +82,10 @@ public class MakespanMain {
             crossover = new SinglePointCrossover();
         }
         else if(crossChoice == 2){
-            crossover = new TwoPointCrossover();
+            crossover = new NPointCrossover();
         }
         else{
-            crossover = new ArithmeticCrossover();
+            crossover = new UniformCrossover();
         }
         //=============================================================
         // Do the same for mutation and replacement

@@ -6,7 +6,7 @@ import softcomputing.makespanProblem.Machine;
 import java.util.List;
 
 
-public class JobSchedulingFitness implements FitnessFunction{
+public class JobSchedulingFitness<T> implements FitnessFunction<T>{
     private final List<Job> jobs;
     private final List<Machine> machines;
 
