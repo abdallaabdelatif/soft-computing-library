@@ -1,9 +1,8 @@
 package softcomputing.genetic.population;
 
-import softcomputing.genetic.chromosome.Chromosome;
-
 import java.util.ArrayList;
 import java.util.List;
+import softcomputing.genetic.chromosome.Chromosome;
 
 public class Population<T> {
     private final List<Chromosome<T>> individuals = new ArrayList<>();
