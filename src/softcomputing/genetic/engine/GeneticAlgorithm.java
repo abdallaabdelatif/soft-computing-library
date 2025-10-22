@@ -1,5 +1,7 @@
 package softcomputing.genetic.engine;
 
+import java.util.ArrayList;
+import java.util.List;
 import softcomputing.genetic.chromosome.Chromosome;
 import softcomputing.genetic.chromosome.ChromosomeFactory;
 import softcomputing.genetic.chromosome.ChromosomeType;
@@ -8,9 +10,7 @@ import softcomputing.genetic.operators.CrossoverStrategy;
 import softcomputing.genetic.operators.MutationStrategy;
 import softcomputing.genetic.operators.ReplacementStrategy;
 import softcomputing.genetic.operators.SelectionStrategy;
-
-import java.util.ArrayList;
-import java.util.List;
+import softcomputing.genetic.population.Population;
 
 public class GeneticAlgorithm<T> {
 
@@ -52,5 +52,56 @@ public class GeneticAlgorithm<T> {
     }
 
     public void run() {
+    // Initialize population
+    Population<T> currentPopulation = new Population<>();
+    for (Chromosome<T> c : population) {
+        currentPopulation.addIndividual(c);
     }
+
+    Chromosome<T> bestChromosome = null;
+    double bestFitness = Double.NEGATIVE_INFINITY;
+
+    for (int gen = 0; gen < params.getMaxGenerations(); gen++) {
+
+        for (Chromosome<T> c : currentPopulation.getIndividuals()) {
+            double fit = fitness.evaluate((Chromosome<Integer>) c);  
+            c.setFitness(fit);
+
+            // Track best solution
+            if (fit > bestFitness) {
+                bestFitness = fit;
+                bestChromosome = c.copy();
+            }
+        }
+
+        // Selection
+        List<Chromosome<T>> parents = selection.select(currentPopulation, params.getPopulationSize() / 2);
+
+        // Crossover & Mutation -> generate offspring
+        Population<T> offspring = new Population<>();
+        for (int i = 0; i < parents.size(); i += 2) {
+            Chromosome<T> p1 = parents.get(i);
+            Chromosome<T> p2 = parents.get(i + 1);
+            Chromosome<T> c1 = p1.copy();
+            Chromosome<T> c2 = p2.copy();
+
+            crossover.operate(p1, p2, c1, c2);
+            mutation.mutate(c1, params.getMutationRate());
+            mutation.mutate(c2, params.getMutationRate());
+
+            offspring.addIndividual(c1);
+            offspring.addIndividual(c2);
+        }
+
+        // Replacement: replace current population with offspring
+        currentPopulation = replacement.replace(currentPopulation, offspring);
+
+        System.out.println("Generation " + gen + " - Best Fitness: " + bestFitness);
+    }
+
+    System.out.println("\nBest Solution Found:");
+    System.out.println("Fitness: " + bestFitness);
+    System.out.println("Chromosome: " + bestChromosome);
+}
+
 }
