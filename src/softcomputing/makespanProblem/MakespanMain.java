@@ -37,6 +37,8 @@ public class MakespanMain {
         System.out.print("Enter mutation rate (default = 0.05): ");
         params.setMutationRate(getOrDefault(sc, 0.05f));
 
+        System.out.print("Enter elites count (default = 2): ");
+        params.setEliteCount(getOrDefault(sc, 2));
         return params;
     }
 
@@ -87,7 +89,7 @@ public class MakespanMain {
         if (crossChoice == 1) {
             crossover = new SinglePointCrossover();
         } else if (crossChoice == 2) {
-            crossover = new NPointCrossover();
+            crossover = new UniformCrossover();
         } else {
             crossover = new UniformCrossover();
         }
@@ -145,7 +147,21 @@ public class MakespanMain {
         // =============================================================
         // Replacement method
         // =============================================================
+        System.out.println("Choose replacement method:");
+        System.out.println("1. Survival of the fittest");
+        System.out.println("2. Steady-State");
+        System.out.println("3. Elitism");
 
+        int replaceChoice = sc.nextInt();
+        ReplacementStrategy<?> replacement;
+
+        if (replaceChoice == 1) {
+            replacement = new SurvivalOfFittestReplacement();
+        } else if (replaceChoice == 2) {
+            replacement = new SteadyStateReplacement();
+        } else if (replaceChoice == 3) {
+            replacement = new ElitismReplacement();
+        }
         
         // =============================================================
         // Chromosome representation

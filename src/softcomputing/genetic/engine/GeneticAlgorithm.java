@@ -94,7 +94,7 @@ public class GeneticAlgorithm<T> {
         }
 
         // Replacement: replace current population with offspring
-        currentPopulation = replacement.replace(currentPopulation, offspring);
+        currentPopulation = replacement.replace(currentPopulation, offspring, params.getEliteCount());
 
         System.out.println("Generation " + gen + " - Best Fitness: " + bestFitness);
     }

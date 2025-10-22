@@ -5,6 +5,7 @@ public class GAParameters {
     private int maxGenerations;
     private float crossoverRate;
     private float mutationRate;
+    private int eliteCount;
 
     public GAParameters() {
     }
@@ -39,5 +40,14 @@ public class GAParameters {
 
     public void setMutationRate(float mutationRate) {
         this.mutationRate = mutationRate;
+    }
+
+    public int getEliteCount() {
+        return eliteCount;
+
+    }
+
+    public void setEliteCount(int eliteCount) {
+        this.eliteCount = eliteCount;
     }
 }
