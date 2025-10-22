@@ -12,11 +12,11 @@ public class NPointCrossover<T> implements CrossoverStrategy<T>{
     int N;
     double pc;
     
-    public NPointCrossover(int chromosomeLength, int n, double pc){
-        this.chromosomeLength = chromosomeLength;
-        this.N = n;
-        this.pc = pc;
-    }
+//    public NPointCrossover(int chromosomeLength, int n, double pc){
+//        this.chromosomeLength = chromosomeLength;
+//        this.N = n;
+//        this.pc = pc;
+//    }
 
     @Override
     public void operate(Chromosome<T> parent1, Chromosome<T> parent2, Chromosome<T> child1, Chromosome<T> child2){

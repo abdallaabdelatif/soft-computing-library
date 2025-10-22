@@ -89,7 +89,7 @@ public class MakespanMain {
         if (crossChoice == 1) {
             crossover = new SinglePointCrossover();
         } else if (crossChoice == 2) {
-            crossover = new UniformCrossover();
+            crossover = new NPointCrossover();
         } else {
             crossover = new UniformCrossover();
         }
@@ -106,7 +106,7 @@ public class MakespanMain {
         System.out.println("6. Non-Uniform (Floating-Point)");
 
         int mutChoice = sc.nextInt();
-        MutationStrategy<?> mutation;
+        MutationStrategy mutation;
         ChromosomeType type = null; 
 
         if (mutChoice == 1) {
@@ -153,7 +153,7 @@ public class MakespanMain {
         System.out.println("3. Elitism");
 
         int replaceChoice = sc.nextInt();
-        ReplacementStrategy<?> replacement;
+        ReplacementStrategy replacement = null;
 
         if (replaceChoice == 1) {
             replacement = new SurvivalOfFittestReplacement();
@@ -183,21 +183,23 @@ public class MakespanMain {
             default -> ChromosomeType.FLOATING_POINT;
         };
 
-        Chromosome<?> chromosome;
+        Chromosome chromosome;
+        int minInt = 0 , maxInt = 0;
+        double minD = 0 , maxD = 0;
         if (type == ChromosomeType.BINARY) {
             chromosome = factory.createChromosome(type, geneLength, null, null);
         } else if (type == ChromosomeType.INTEGER) {
             System.out.print("Enter minimum integer gene value: ");
-            int min = sc.nextInt();
+            minInt = sc.nextInt();
             System.out.print("Enter maximum integer gene value: ");
-            int max = sc.nextInt();
-            chromosome = factory.createChromosome(type, geneLength, min, max);
+            maxInt = sc.nextInt();
+            chromosome = factory.createChromosome(type, geneLength, minInt, maxInt);
         } else {
             System.out.print("Enter minimum floating-point gene value: ");
-            double min = sc.nextDouble();
+            minD = sc.nextDouble();
             System.out.print("Enter maximum floating-point gene value: ");
-            double max = sc.nextDouble();
-            chromosome = factory.createChromosome(type, geneLength, min, max);
+            maxD = sc.nextDouble();
+            chromosome = factory.createChromosome(type, geneLength, minD, maxD);
         }
 
         // =============================================================
@@ -224,9 +226,9 @@ public class MakespanMain {
         // =============================================================
         // Fitness and GA setup
         // =============================================================
-        FitnessFunction<Integer> fitness = new JobSchedulingFitness(jobs, machines);
+        FitnessFunction fitness = new JobSchedulingFitness(jobs, machines);
 
-        GeneticAlgorithm<Integer> ga = new GeneticAlgorithm<>(
+        GeneticAlgorithm ga = new GeneticAlgorithm(
                 factory,
                 selection,
                 crossover,
@@ -235,7 +237,11 @@ public class MakespanMain {
                 fitness,
                 params
         );
-
+        switch (type) {
+            case BINARY -> ga.initializePopulation(type, geneLength);
+            case INTEGER -> ga.initializePopulation(type, geneLength, minInt, maxInt);
+            case FLOATING_POINT -> ga.initializePopulation(type, geneLength, minD, maxD);
+        }
         return ga;
     }
 }

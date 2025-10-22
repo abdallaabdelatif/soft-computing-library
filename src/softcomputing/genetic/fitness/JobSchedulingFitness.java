@@ -6,7 +6,7 @@ import softcomputing.genetic.chromosome.Chromosome;
 import softcomputing.makespanProblem.Job;
 import softcomputing.makespanProblem.Machine;
 
-public class JobSchedulingFitness implements FitnessFunction<Integer> {
+public class JobSchedulingFitness<T> implements FitnessFunction<T> {
     private final List<Job> jobs;
     private final List<Machine> machines;
 
@@ -16,15 +16,14 @@ public class JobSchedulingFitness implements FitnessFunction<Integer> {
     }
 
     @Override
-    public double evaluate(Chromosome<Integer> chromosome) {
-        Integer[] genes = chromosome.getGenes();
+    public double evaluate(Chromosome<T> chromosome) {
+        T[] genes = chromosome.getGenes();
         
         for (Machine m : machines) {
             m.getAssignedJobs().clear();
         }
 
-        for (int jobId : genes) {
-            Job job = jobs.get(jobId);
+        for (Job job : jobs) {
             Machine bestMachine = machines.get(0);
             for (Machine m : machines) {
                 if (m.getTotalProcessingTime() < bestMachine.getTotalProcessingTime()) {
@@ -38,12 +37,12 @@ public class JobSchedulingFitness implements FitnessFunction<Integer> {
         for (Machine m : machines) {
             makespan = Math.max(makespan, m.getTotalProcessingTime());
         }
-
+        chromosome.setFitness((double) 1 /makespan);
         boolean feasible = genes.length == jobs.size() && Arrays.stream(genes).distinct().count() == genes.length;
         if (!feasible) {
             return Double.MAX_VALUE;  
         }
 
-        return -makespan;  
+        return (double) 1 /makespan;
     }
 }
