@@ -2,7 +2,6 @@ package softcomputing.genetic.chromosome;
 
 import softcomputing.genetic.chromosome.Chromosome;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class IntegerChromosome implements Chromosome<Integer> {
@@ -39,8 +38,19 @@ public class IntegerChromosome implements Chromosome<Integer> {
 
     @Override
     public void randomizeGenes(Random random) {
-        for (int i = 0; i < genes.length; i++) {
-            genes[i] = random.nextInt(maxValue - minValue + 1) + minValue;
+        if (minValue == 0 && maxValue == genes.length - 1) {
+            // Generate unique permutation for job scheduling (0 to length-1)
+            List<Integer> perm = new ArrayList<>();
+            for (int i = minValue; i <= maxValue; i++)
+                perm.add(i);
+            Collections.shuffle(perm, random);
+            for (int i = 0; i < genes.length; i++)
+                genes[i] = perm.get(i);
+        } else {
+            // Random values (may have duplicates)
+            for (int i = 0; i < genes.length; i++) {
+                genes[i] = random.nextInt(maxValue - minValue + 1) + minValue;
+            }
         }
     }
 
@@ -49,17 +59,10 @@ public class IntegerChromosome implements Chromosome<Integer> {
         IntegerChromosome clone = new IntegerChromosome(genes.length, minValue, maxValue);
         clone.setFitness(fitness);
         Integer[] copiedGenes = new Integer[genes.length];
-        for(int i = 0 ; i < genes.length ; i++){
+        for (int i = 0; i < genes.length; i++) {
             copiedGenes[i] = genes[i];
         }
         clone.setGenes(copiedGenes);
         return clone;
-    }
-
-    @Override
-    public String toString() {
-        return "IntegerChromosome{" +
-                "genes=" + Arrays.toString(genes) +
-                '}';
     }
 }
