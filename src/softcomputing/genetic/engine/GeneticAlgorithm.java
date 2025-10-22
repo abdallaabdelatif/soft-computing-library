@@ -73,7 +73,7 @@ public class GeneticAlgorithm<T> {
 
             for (Chromosome<T> c : currentPopulation.getIndividuals()) {
                 double fit = fitness.evaluate((Chromosome<T>) c);
-                c.setFitness(fit);
+                //c.setFitness(fit);
 
                 // Track best solution
                 if (fit > bestFitness) {
@@ -109,6 +109,6 @@ public class GeneticAlgorithm<T> {
 
         System.out.println("\nBest Solution Found:");
         System.out.println("Fitness: " + bestFitness);
-        System.out.println("Chromosome: " + bestChromosome);
+        System.out.println("Chromosome: " + bestChromosome.toString());
     }
 }

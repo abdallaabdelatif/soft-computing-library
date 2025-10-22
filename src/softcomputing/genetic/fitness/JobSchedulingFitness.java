@@ -18,31 +18,57 @@ public class JobSchedulingFitness<T> implements FitnessFunction<T> {
     @Override
     public double evaluate(Chromosome<T> chromosome) {
         T[] genes = chromosome.getGenes();
-        
         for (Machine m : machines) {
             m.getAssignedJobs().clear();
         }
+        for (int i = 0; i < jobs.size(); i++) {
+            int machineIndex;
 
-        for (Job job : jobs) {
-            Machine bestMachine = machines.get(0);
-            for (Machine m : machines) {
-                if (m.getTotalProcessingTime() < bestMachine.getTotalProcessingTime()) {
-                    bestMachine = m;
-                }
+            if (genes[i] instanceof Integer) {
+                machineIndex = (Integer) genes[i];
+            } else if (genes[i] instanceof Double) {
+                machineIndex = (int) Math.round((Double) genes[i]);
+            } else {
+                machineIndex = (Boolean) genes[i] ? 1 : 0;
             }
-            bestMachine.assignJob(job);
+            machineIndex = Math.floorMod(machineIndex, machines.size());
+            machines.get(machineIndex).assignJob(jobs.get(i));
         }
-
         int makespan = 0;
         for (Machine m : machines) {
             makespan = Math.max(makespan, m.getTotalProcessingTime());
         }
-        chromosome.setFitness((double) 1 /makespan);
-        boolean feasible = genes.length == jobs.size() && Arrays.stream(genes).distinct().count() == genes.length;
-        if (!feasible) {
-            return Double.MAX_VALUE;  
-        }
-
-        return (double) 1 /makespan;
+        double fitnessValue = 1.0 / makespan;
+        chromosome.setFitness(fitnessValue);
+        return fitnessValue;
     }
+//    @Override
+//    public double evaluate(Chromosome<T> chromosome) {
+//        T[] genes = chromosome.getGenes();
+//
+//        for (Machine m : machines) {
+//            m.getAssignedJobs().clear();
+//        }
+//
+//        for (Job job : jobs) {
+//            Machine bestMachine = machines.get(0);
+//            for (Machine m : machines) {
+//                if (m.getTotalProcessingTime() < bestMachine.getTotalProcessingTime()) {
+//                    bestMachine = m;
+//                }
+//            }
+//            bestMachine.assignJob(job);
+//        }
+//
+//        int makespan = 0;
+//        for (Machine m : machines) {
+//            makespan = Math.max(makespan, m.getTotalProcessingTime());
+//        }
+//        chromosome.setFitness((double) 1 /makespan);
+////        boolean feasible = genes.length == jobs.size() && Arrays.stream(genes).distinct().count() == genes.length;
+////        if (!feasible) {
+////            return Double.MAX_VALUE;
+////        }
+//        return (double) 1 /makespan;
+//    }
 }

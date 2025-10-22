@@ -2,6 +2,7 @@ package softcomputing.genetic.chromosome;
 
 import softcomputing.genetic.chromosome.Chromosome;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class IntegerChromosome implements Chromosome<Integer> {
@@ -53,5 +54,12 @@ public class IntegerChromosome implements Chromosome<Integer> {
         }
         clone.setGenes(copiedGenes);
         return clone;
+    }
+
+    @Override
+    public String toString() {
+        return "IntegerChromosome{" +
+                "genes=" + Arrays.toString(genes) +
+                '}';
     }
 }

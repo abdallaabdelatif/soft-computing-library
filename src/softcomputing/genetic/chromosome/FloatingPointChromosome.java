@@ -1,5 +1,6 @@
 package softcomputing.genetic.chromosome;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class FloatingPointChromosome implements Chromosome<Double> {
@@ -51,5 +52,12 @@ public class FloatingPointChromosome implements Chromosome<Double> {
         }
         clone.setGenes(copiedGenes);
         return clone;
+    }
+
+    @Override
+    public String toString() {
+        return "FloatingPointChromosome{" +
+                "genes=" + Arrays.toString(genes) +
+                '}';
     }
 }

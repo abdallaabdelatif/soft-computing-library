@@ -162,45 +162,7 @@ public class MakespanMain {
         } else if (replaceChoice == 3) {
             replacement = new ElitismReplacement();
         }
-        
-        // =============================================================
-        // Chromosome representation
-        // =============================================================
-        System.out.println("Choose chromosome representation:");
-        System.out.println("1. Binary");
-        System.out.println("2. Integer");
-        System.out.println("3. Floating Point");
-        int chromChoice = sc.nextInt();
 
-        System.out.print("Enter number of genes (jobs): ");
-        int geneLength = sc.nextInt();
-
-        ChromosomeFactory factory = new ChromosomeFactory();
-
-        type = switch (chromChoice) {
-            case 1 -> ChromosomeType.BINARY;
-            case 2 -> ChromosomeType.INTEGER;
-            default -> ChromosomeType.FLOATING_POINT;
-        };
-
-        Chromosome chromosome;
-        int minInt = 0 , maxInt = 0;
-        double minD = 0 , maxD = 0;
-        if (type == ChromosomeType.BINARY) {
-            chromosome = factory.createChromosome(type, geneLength, null, null);
-        } else if (type == ChromosomeType.INTEGER) {
-            System.out.print("Enter minimum integer gene value: ");
-            minInt = sc.nextInt();
-            System.out.print("Enter maximum integer gene value: ");
-            maxInt = sc.nextInt();
-            chromosome = factory.createChromosome(type, geneLength, minInt, maxInt);
-        } else {
-            System.out.print("Enter minimum floating-point gene value: ");
-            minD = sc.nextDouble();
-            System.out.print("Enter maximum floating-point gene value: ");
-            maxD = sc.nextDouble();
-            chromosome = factory.createChromosome(type, geneLength, minD, maxD);
-        }
 
         // =============================================================
         // Job & Machine setup
@@ -222,6 +184,47 @@ public class MakespanMain {
         for (int i = 0; i < numMachines; i++) {
             machines.add(new Machine(i));
         }
+        
+        // =============================================================
+        // Chromosome representation
+        // =============================================================
+        System.out.println("Choose chromosome representation:");
+        System.out.println("1. Binary");
+        System.out.println("2. Integer");
+        System.out.println("3. Floating Point");
+        int chromChoice = sc.nextInt();
+
+//        System.out.print("Enter number of genes (jobs): ");
+//        int geneLength = sc.nextInt();
+
+        ChromosomeFactory factory = new ChromosomeFactory();
+
+        type = switch (chromChoice) {
+            case 1 -> ChromosomeType.BINARY;
+            case 2 -> ChromosomeType.INTEGER;
+            default -> ChromosomeType.FLOATING_POINT;
+        };
+
+        Chromosome chromosome;
+        int minInt = 0 , maxInt = 0;
+        double minD = 0 , maxD = 0;
+        if (type == ChromosomeType.BINARY) {
+            chromosome = factory.createChromosome(type, numJobs, null, null);
+        } else if (type == ChromosomeType.INTEGER) {
+//            System.out.print("Enter minimum integer gene value: ");
+//            minInt = sc.nextInt();
+//            System.out.print("Enter maximum integer gene value: ");
+//            maxInt = sc.nextInt();
+            chromosome = factory.createChromosome(type, numJobs, 0, numMachines - 1);
+        } else {
+//            System.out.print("Enter minimum floating-point gene value: ");
+//            minD = sc.nextDouble();
+//            System.out.print("Enter maximum floating-point gene value: ");
+//            maxD = sc.nextDouble();
+            chromosome = factory.createChromosome(type, numJobs, 0, 1);
+        }
+
+
 
         // =============================================================
         // Fitness and GA setup
@@ -238,9 +241,9 @@ public class MakespanMain {
                 params
         );
         switch (type) {
-            case BINARY -> ga.initializePopulation(type, geneLength);
-            case INTEGER -> ga.initializePopulation(type, geneLength, minInt, maxInt);
-            case FLOATING_POINT -> ga.initializePopulation(type, geneLength, minD, maxD);
+            case BINARY -> ga.initializePopulation(type, numJobs,0,1);
+            case INTEGER -> ga.initializePopulation(type, numJobs, 0, numMachines - 1);
+            case FLOATING_POINT -> ga.initializePopulation(type, numJobs, 0, 1);
         }
         return ga;
     }

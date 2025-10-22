@@ -1,5 +1,6 @@
 package softcomputing.genetic.chromosome;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class BinaryChromosome implements Chromosome<Boolean>{
@@ -47,5 +48,12 @@ public class BinaryChromosome implements Chromosome<Boolean>{
         }
         clone.setGenes(copiedGenes);
         return clone;
+    }
+
+    @Override
+    public String toString() {
+        return "BinaryChromosome{" +
+                "genes=" + Arrays.toString(genes) +
+                '}';
     }
 }
