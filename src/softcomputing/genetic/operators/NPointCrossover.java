@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
-
 import softcomputing.genetic.chromosome.Chromosome;
 
 public class NPointCrossover<T> implements CrossoverStrategy<T>{
