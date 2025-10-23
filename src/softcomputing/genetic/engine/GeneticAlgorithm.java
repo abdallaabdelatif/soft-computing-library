@@ -81,17 +81,18 @@ public class GeneticAlgorithm<T> {
 
         Chromosome<T> bestChromosome = null;
         double bestFitness = 0;
-
         for (int gen = 0; gen < params.getMaxGenerations(); gen++) {
+                Chromosome<T> bestChromosomeInGen = null;
+                double bestFitnessInGen = 0;
 
             for (Chromosome<T> c : currentPopulation.getIndividuals()) {
                 double fit = fitness.evaluate((Chromosome<T>) c);
                 //c.setFitness(fit);
 
                 // Track best solution
-                if (fit > bestFitness) {
-                    bestFitness = fit;
-                    bestChromosome = c.copy();
+                if (fit > bestFitnessInGen) {
+                    bestFitnessInGen = fit;
+                    bestChromosomeInGen = c.copy();
                 }
             }
 
@@ -127,6 +128,8 @@ public class GeneticAlgorithm<T> {
             for (Chromosome<T> c : currentPopulation.getIndividuals()) {
                 System.out.println("  " + c.toString() + " -> fitness: " + c.getFitness());
             }
+            bestChromosome = bestChromosomeInGen;
+            bestFitness = bestFitnessInGen;
         }
         System.out.println("\nBest Solution Found:");
         System.out.println("Fitness: " + bestFitness);
