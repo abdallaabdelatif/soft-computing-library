@@ -81,13 +81,14 @@ public class GeneticAlgorithm<T> {
 
         Chromosome<T> bestChromosome = null;
         double bestFitness = 0;
+        double[] bestFitnessHistory = new double[params.getMaxGenerations()];
         for (int gen = 0; gen < params.getMaxGenerations(); gen++) {
                 Chromosome<T> bestChromosomeInGen = null;
                 double bestFitnessInGen = 0;
 
             for (Chromosome<T> c : currentPopulation.getIndividuals()) {
-                double fit = fitness.evaluate((Chromosome<T>) c);
-                //c.setFitness(fit);
+                double fit = fitness.evaluate(c);
+                c.setFitness(fit);
 
                 // Track best solution
                 if (fit > bestFitnessInGen) {
@@ -95,7 +96,11 @@ public class GeneticAlgorithm<T> {
                     bestChromosomeInGen = c.copy();
                 }
             }
-
+            bestFitnessHistory[gen] = bestFitnessInGen;
+            if (bestFitnessInGen > bestFitness) {
+                bestFitness = bestFitnessInGen;
+                bestChromosome = bestChromosomeInGen.copy();
+            }
             // Selection
             List<Chromosome<T>> parents = selection.select(currentPopulation, params.getPopulationSize() / 2);
 
@@ -131,8 +136,13 @@ public class GeneticAlgorithm<T> {
             bestChromosome = bestChromosomeInGen;
             bestFitness = bestFitnessInGen;
         }
-        System.out.println("\nBest Solution Found:");
-        System.out.println("Fitness: " + bestFitness);
-        System.out.println("Chromosome: " + bestChromosome.toString());
+        System.out.println("Final Results: ");
+        System.out.println("Overall Best Fitness: " + bestFitness);
+        System.out.println("Best Chromosome: " + bestChromosome);
+
+        System.out.println("\nFitness progression:");
+        for (int i = 0; i < bestFitnessHistory.length; i++) {
+            System.out.printf("Gen %d: %.6f%n", i, bestFitnessHistory[i]);
+        }
     }
 }

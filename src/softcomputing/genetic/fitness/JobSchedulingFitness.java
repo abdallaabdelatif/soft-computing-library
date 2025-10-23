@@ -42,8 +42,9 @@ public class JobSchedulingFitness<T> implements FitnessFunction<T> {
             chromosome.setFitness(0);
             return 0;
         }
+        System.out.println("Chromosome " + Arrays.toString(genes) + " -> makespan: " + makespan);
         double fitnessValue = 1.0 / makespan;
-        chromosome.setFitness(fitnessValue);
+        //chromosome.setFitness(fitnessValue);
         return fitnessValue;
     }
 //    @Override
