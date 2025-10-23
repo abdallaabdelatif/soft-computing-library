@@ -1,7 +1,10 @@
 package softcomputing.genetic.engine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+
 import softcomputing.genetic.chromosome.Chromosome;
 import softcomputing.genetic.chromosome.ChromosomeFactory;
 import softcomputing.genetic.chromosome.ChromosomeType;
@@ -57,6 +60,16 @@ public class GeneticAlgorithm<T> {
             Chromosome<T> c = factory.createChromosome(type, geneLength, min, max);
             population.add(c);
         }
+        System.out.println("Population initialized with " + population.size() + " chromosomes");
+        for (Chromosome<T> c : population) {
+            System.out.print("Chromosome: ");
+            T[] genes = c.getGenes();
+            for (T gene : genes) {
+                System.out.print(gene + " ");
+            }
+            System.out.println();
+        }
+
     }
 
     public void run() {
@@ -89,7 +102,12 @@ public class GeneticAlgorithm<T> {
             Population<T> offspring = new Population<>();
             for (int i = 0; i < parents.size(); i += 2) {
                 Chromosome<T> p1 = parents.get(i);
-                Chromosome<T> p2 = parents.get(i + 1);
+                Chromosome<T> p2 ;
+                if (i + 1 < parents.size()) {
+                    p2 = parents.get(i + 1);
+                } else {
+                    p2 = parents.get(new Random().nextInt(parents.size()));
+                }
                 Chromosome<T> c1 = p1.copy();
                 Chromosome<T> c2 = p2.copy();
 
@@ -99,14 +117,17 @@ public class GeneticAlgorithm<T> {
 
                 offspring.addIndividual(c1);
                 offspring.addIndividual(c2);
+                System.out.println("Child genes after crossover/mutation: " + Arrays.toString(c1.getGenes()));
             }
 
             // Replacement: replace current population with offspring
             currentPopulation = replacement.replace(currentPopulation, offspring, params.getEliteCount());
 
-            System.out.println("Generation " + gen + " - Best Fitness: " + bestFitness);
+            System.out.println("Generation " + gen + ":");
+            for (Chromosome<T> c : currentPopulation.getIndividuals()) {
+                System.out.println("  " + c.toString() + " -> fitness: " + c.getFitness());
+            }
         }
-
         System.out.println("\nBest Solution Found:");
         System.out.println("Fitness: " + bestFitness);
         System.out.println("Chromosome: " + bestChromosome.toString());

@@ -38,6 +38,10 @@ public class JobSchedulingFitness<T> implements FitnessFunction<T> {
         for (Machine m : machines) {
             makespan = Math.max(makespan, m.getTotalProcessingTime());
         }
+        if (makespan == 0) {
+            chromosome.setFitness(0);
+            return 0;
+        }
         double fitnessValue = 1.0 / makespan;
         chromosome.setFitness(fitnessValue);
         return fitnessValue;

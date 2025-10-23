@@ -13,7 +13,6 @@ public class IntegerChromosome implements Chromosome<Integer> {
 
     public IntegerChromosome(int length, int minValue, int maxValue) {
         this.genes = new Integer[length];
-        //System.out.println(genes.length);
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
@@ -41,7 +40,7 @@ public class IntegerChromosome implements Chromosome<Integer> {
     @Override
     public void randomizeGenes(Random random) {
         for (int i = 0; i < genes.length; i++) {
-            genes[i] = random.nextInt(maxValue - minValue + 1);
+            genes[i] = Integer.valueOf(random.nextInt(maxValue - minValue + 1) + minValue);
         }
     }
 
