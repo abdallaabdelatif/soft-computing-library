@@ -2,17 +2,16 @@ package softcomputing.genetic.operators;
 
 import java.util.Arrays;
 import java.util.Random;
-
 import softcomputing.genetic.chromosome.Chromosome;
 
 public class UniformCrossover<T> implements CrossoverStrategy<T>{
     int chromosomeLength;
     double pc;
 
-//    public UniformCrossover(int chromosomeLength, double pc){
-//        this.chromosomeLength = chromosomeLength;
-//        this.pc = pc;
-//    }
+   public UniformCrossover(int chromosomeLength, double pc){
+       this.chromosomeLength = chromosomeLength;
+       this.pc = pc;
+   }
 
     @Override
     public void operate(Chromosome<T> parent1, Chromosome<T> parent2, Chromosome<T> child1, Chromosome<T> child2){

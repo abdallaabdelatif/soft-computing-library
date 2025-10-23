@@ -2,17 +2,16 @@ package softcomputing.genetic.operators;
 
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
-
 import softcomputing.genetic.chromosome.Chromosome;
 
 public class SinglePointCrossover<T> implements CrossoverStrategy<T>{
     int chromosomeLength;
     double pc;
 
-//    public SinglePointCrossover(int length, double pc){
-//        this.chromosomeLength = length;
-//        this.pc = pc;
-//    }
+   public SinglePointCrossover(int length, double pc){
+       this.chromosomeLength = length;
+       this.pc = pc;
+   }
 
     @Override
     public void operate(Chromosome<T> parent1, Chromosome<T> parent2, Chromosome<T> child1, Chromosome<T> child2){

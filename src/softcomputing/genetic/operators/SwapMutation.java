@@ -1,7 +1,8 @@
 package softcomputing.genetic.operators;
 
-import softcomputing.genetic.chromosome.Chromosome;
+import java.util.Arrays;
 import java.util.Random;
+import softcomputing.genetic.chromosome.Chromosome;
 
 public class SwapMutation<T> implements MutationStrategy<T> {
     private final Random random = new Random();
@@ -9,6 +10,10 @@ public class SwapMutation<T> implements MutationStrategy<T> {
     @Override
     public void mutate(Chromosome<T> chromosome, double mutationRate) {
         T[] genes = chromosome.getGenes();
+
+        // Print genes before mutation
+        System.out.println("Before mutation: " + Arrays.toString(genes));
+
         for (int i = 0; i < genes.length; i++) {
             if (random.nextDouble() < mutationRate) {
                 int j = random.nextInt(genes.length);
@@ -17,6 +22,10 @@ public class SwapMutation<T> implements MutationStrategy<T> {
                 genes[j] = temp;
             }
         }
+
+        // Print genes after mutation
+        System.out.println("After mutation:  " + Arrays.toString(genes));
+
         chromosome.setGenes(genes);
     }
 }
