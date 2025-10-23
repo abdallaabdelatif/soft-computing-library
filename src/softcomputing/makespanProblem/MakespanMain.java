@@ -10,6 +10,8 @@ import softcomputing.genetic.engine.GAParameters;
 import softcomputing.genetic.engine.GeneticAlgorithm;
 import softcomputing.genetic.fitness.FitnessFunction;
 import softcomputing.genetic.fitness.JobSchedulingFitness;
+import softcomputing.genetic.infeasibilityCheck.ConstraintHandler;
+import softcomputing.genetic.infeasibilityCheck.JobConstraintHandler;
 import softcomputing.genetic.operators.*;
 
 public class MakespanMain {
@@ -183,7 +185,9 @@ public class MakespanMain {
             chromosome = factory.createChromosome(type, numJobs, 0, 1);
         }
 
-        FitnessFunction fitness = new JobSchedulingFitness(jobs, machines);
+        ConstraintHandler constraintHandler = new JobConstraintHandler(numMachines, numJobs);
+        FitnessFunction fitness = new JobSchedulingFitness(jobs, machines, constraintHandler);
+
 
         GeneticAlgorithm ga = new GeneticAlgorithm(
                 factory,

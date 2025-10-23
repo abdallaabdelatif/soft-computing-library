@@ -11,7 +11,6 @@ public class SwapMutation<T> implements MutationStrategy<T> {
     public void mutate(Chromosome<T> chromosome, double mutationRate) {
         T[] genes = chromosome.getGenes();
 
-        // Print genes before mutation
         System.out.println("Before mutation: " + Arrays.toString(genes));
 
         for (int i = 0; i < genes.length; i++) {
@@ -23,7 +22,6 @@ public class SwapMutation<T> implements MutationStrategy<T> {
             }
         }
 
-        // Print genes after mutation
         System.out.println("After mutation:  " + Arrays.toString(genes));
 
         chromosome.setGenes(genes);

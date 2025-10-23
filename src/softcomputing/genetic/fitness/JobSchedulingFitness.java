@@ -3,20 +3,30 @@ package softcomputing.genetic.fitness;
 import java.util.Arrays;
 import java.util.List;
 import softcomputing.genetic.chromosome.Chromosome;
+import softcomputing.genetic.infeasibilityCheck.ConstraintHandler;
 import softcomputing.makespanProblem.Job;
 import softcomputing.makespanProblem.Machine;
 
 public class JobSchedulingFitness<T> implements FitnessFunction<T> {
     private final List<Job> jobs;
     private final List<Machine> machines;
+    private final ConstraintHandler<T> constraintHandler;
 
-    public JobSchedulingFitness(List<Job> jobs, List<Machine> machines) {
+     public JobSchedulingFitness(List<Job> jobs, List<Machine> machines, ConstraintHandler<T> constraintHandler) {
         this.jobs = jobs;
         this.machines = machines;
+        this.constraintHandler = constraintHandler;
     }
 
     @Override
     public double evaluate(Chromosome<T> chromosome) {
+
+        if (!constraintHandler.isFeasible(chromosome)) {
+            System.out.println("Infeasible chromosome: " + Arrays.toString(chromosome.getGenes()));
+            chromosome.setFitness(0); 
+            return 0;
+        }
+
         T[] genes = chromosome.getGenes();
         for (Machine m : machines) {
             m.getAssignedJobs().clear();
