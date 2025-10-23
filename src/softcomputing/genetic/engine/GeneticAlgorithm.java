@@ -83,8 +83,8 @@ public class GeneticAlgorithm<T> {
         double bestFitness = 0;
         double[] bestFitnessHistory = new double[params.getMaxGenerations()];
         for (int gen = 0; gen < params.getMaxGenerations(); gen++) {
-                Chromosome<T> bestChromosomeInGen = null;
-                double bestFitnessInGen = 0;
+            Chromosome<T> bestChromosomeInGen = null;
+            double bestFitnessInGen = 0;
 
             for (Chromosome<T> c : currentPopulation.getIndividuals()) {
                 double fit = fitness.evaluate(c);
@@ -133,8 +133,7 @@ public class GeneticAlgorithm<T> {
             for (Chromosome<T> c : currentPopulation.getIndividuals()) {
                 System.out.println("  " + c.toString() + " -> fitness: " + c.getFitness());
             }
-            bestChromosome = bestChromosomeInGen;
-            bestFitness = bestFitnessInGen;
+
         }
         System.out.println("Final Results: ");
         System.out.println("Overall Best Fitness: " + bestFitness);

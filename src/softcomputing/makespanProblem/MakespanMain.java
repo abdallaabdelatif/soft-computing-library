@@ -204,7 +204,7 @@ public class MakespanMain {
         );
         switch (type) {
             case BINARY -> ga.initializePopulation(type, numJobs, 0, 1);
-            case INTEGER -> ga.initializePopulation(type, numJobs, 0, numJobs - 1);
+            case INTEGER -> ga.initializePopulation(type, numJobs, 0, numMachines - 1);
             case FLOATING_POINT -> ga.initializePopulation(type, numJobs, 0, 1);
         }
         return ga;
