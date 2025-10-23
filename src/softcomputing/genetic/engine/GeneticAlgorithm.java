@@ -139,7 +139,7 @@ public class GeneticAlgorithm<T> {
         System.out.println("Overall Best Fitness: " + bestFitness);
         System.out.println("Best Chromosome: " + bestChromosome);
 
-        System.out.println("\nFitness progression:");
+        System.out.println("\nBest Fitness of each Gen:");
         for (int i = 0; i < bestFitnessHistory.length; i++) {
             System.out.printf("Gen %d: %.6f%n", i, bestFitnessHistory[i]);
         }
