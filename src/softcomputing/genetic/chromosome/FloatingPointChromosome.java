@@ -36,6 +36,16 @@ public class FloatingPointChromosome implements Chromosome<Double> {
     }
 
     @Override
+    public Double getMax() {
+        return maxValue;
+    }
+
+    @Override
+    public Double getMin() {
+        return minValue;
+    }
+
+    @Override
     public void randomizeGenes(Random random) {
         for (int i = 0; i < genes.length; i++) {
             genes[i] = random.nextDouble();

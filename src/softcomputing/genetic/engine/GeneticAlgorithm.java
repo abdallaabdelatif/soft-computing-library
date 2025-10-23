@@ -46,13 +46,15 @@ public class GeneticAlgorithm<T> {
         this.params = params;
     }
     // for binary
-    public void initializePopulation(ChromosomeType type, int geneLength) {
+    /*
+     *     public void initializePopulation(ChromosomeType type, int geneLength) {
         population = new ArrayList<>();
         for (int i = 0; i < params.getPopulationSize(); i++) {
             Chromosome<T> c = factory.createChromosome(type, geneLength, null, null);
             population.add(c);
         }
     }
+     */
     // for integer and floating point
     public void initializePopulation(ChromosomeType type, int geneLength, T min, T max) {
         population = new ArrayList<>();
