@@ -27,7 +27,11 @@ public class JobSchedulingFitness<T> implements FitnessFunction<T> {
             if (genes[i] instanceof Integer) {
                 machineIndex = (Integer) genes[i];
             } else if (genes[i] instanceof Double) {
-                machineIndex = (int) Math.round((Double) genes[i]);
+                double geneValue = (Double) genes[i];
+                machineIndex = (int) (geneValue * machines.size());
+                if (machineIndex == machines.size()) {
+                    machineIndex = machines.size() - 1;
+                }
             } else {
                 machineIndex = (Boolean) genes[i] ? 1 : 0;
             }

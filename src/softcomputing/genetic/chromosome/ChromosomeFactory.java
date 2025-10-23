@@ -17,7 +17,7 @@ public class ChromosomeFactory {
                 return (Chromosome<T>) c;
             }
             case FLOATING_POINT -> {
-                FloatingPointChromosome c = new FloatingPointChromosome(length, (Double)min, (Double)max);
+                FloatingPointChromosome c = new FloatingPointChromosome(length, 0, 1);
                 c.randomizeGenes(new Random());
                 return (Chromosome<T>) c;
             }

@@ -150,17 +150,9 @@ public class MakespanMain {
             System.out.println("6. Non-Uniform (Floating-Point)");
             int mutChoice = sc.nextInt();
             if (mutChoice == 5) {
-                System.out.print("Enter min gene value: ");
-                double min = sc.nextDouble();
-                System.out.print("Enter max gene value: ");
-                double max = sc.nextDouble();
-                mutation = new UniformMutation(min, max);
+                mutation = new UniformMutation(0, 1);
             } else {
-                System.out.print("Enter min gene value: ");
-                double min = sc.nextDouble();
-                System.out.print("Enter max gene value: ");
-                double max = sc.nextDouble();
-                mutation = new NonUniformMutation(min, max);
+                mutation = new NonUniformMutation(0, 1);
             }
         }
 
@@ -184,11 +176,11 @@ public class MakespanMain {
             maxInt = numJobs - 1;
             chromosome = factory.createChromosome(type, numJobs, minInt, maxInt);
         } else {
-            System.out.print("Enter minimum floating-point gene value: ");
-            minD = sc.nextDouble();
-            System.out.print("Enter maximum floating-point gene value: ");
-            maxD = sc.nextDouble();
-            chromosome = factory.createChromosome(type, numJobs, minD, maxD);
+//            System.out.print("Enter minimum floating-point gene value: ");
+//            minD = sc.nextDouble();
+//            System.out.print("Enter maximum floating-point gene value: ");
+//            maxD = sc.nextDouble();
+            chromosome = factory.createChromosome(type, numJobs, 0, 1);
         }
 
         FitnessFunction fitness = new JobSchedulingFitness(jobs, machines);
