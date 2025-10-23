@@ -7,7 +7,7 @@ public class ChromosomeFactory {
     public <T>Chromosome<T> createChromosome(ChromosomeType type, int length, T min, T max) {
         switch (type) {
             case BINARY -> {
-                BinaryChromosome c = new BinaryChromosome(length);
+                BinaryChromosome c = new BinaryChromosome(length,(int) min, (int) max);
                 c.randomizeGenes(new Random());
                 return (Chromosome<T>) c;
             }

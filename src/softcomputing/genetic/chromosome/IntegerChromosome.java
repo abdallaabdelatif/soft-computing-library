@@ -38,6 +38,17 @@ public class IntegerChromosome implements Chromosome<Integer> {
     }
 
     @Override
+    public Integer getMax() {
+        return maxValue;
+    }
+
+    @Override
+    public Integer getMin() {
+        return minValue;
+    }
+
+
+    @Override
     public void randomizeGenes(Random random) {
         for (int i = 0; i < genes.length; i++) {
             genes[i] = Integer.valueOf(random.nextInt(maxValue - minValue + 1) + minValue);

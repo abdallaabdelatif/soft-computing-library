@@ -3,21 +3,25 @@ package softcomputing.genetic.chromosome;
 import java.util.Arrays;
 import java.util.Random;
 
-public class BinaryChromosome implements Chromosome<Boolean>{
-    private Boolean[] genes;
+public class BinaryChromosome implements Chromosome<Integer>{
+    private Integer[] genes;
     private double fitness;
+    private final int minValue;
+    private final int maxValue;
 
-    public BinaryChromosome(int length) {
-        this.genes = new Boolean[length];
+    public BinaryChromosome(int length, int minValue, int maxValue) {
+        this.genes = new Integer[length];
+        this.minValue = minValue;
+        this.maxValue = maxValue;
     }
 
     @Override
-    public Boolean[] getGenes() {
+    public Integer[] getGenes() {
         return genes;
     }
 
     @Override
-    public void setGenes(Boolean[] genes) {
+    public void setGenes(Integer[] genes) {
         this.genes = genes;
     }
 
@@ -32,17 +36,27 @@ public class BinaryChromosome implements Chromosome<Boolean>{
     }
 
     @Override
+    public Integer getMax() {
+        return maxValue;
+    }
+
+    @Override
+    public Integer getMin() {
+        return minValue;
+    }
+
+    @Override
     public void randomizeGenes(Random random) {
         for (int i = 0; i < genes.length; i++) {
-            genes[i] = random.nextBoolean();
+            genes[i] = Integer.valueOf(random.nextInt(maxValue - minValue + 1) + minValue);
         }
     }
 
     @Override
-    public Chromosome<Boolean> copy() {
-        BinaryChromosome clone = new BinaryChromosome(genes.length);
+    public Chromosome<Integer> copy() {
+        BinaryChromosome clone = new BinaryChromosome(genes.length, minValue, maxValue);
         clone.setFitness(fitness);
-        Boolean[] copiedGenes = new Boolean[genes.length];
+        Integer[] copiedGenes = new Integer[genes.length];
         for(int i = 0; i < genes.length; i++) {
             copiedGenes[i] = genes[i];
         }

@@ -8,5 +8,7 @@ public interface Chromosome<T> extends Cloneable{
     double getFitness();
     void setFitness(double fitness);
     void randomizeGenes(Random random);
+    T getMax();
+    T getMin();
     Chromosome<T> copy();
 }

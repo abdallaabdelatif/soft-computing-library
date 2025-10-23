@@ -170,7 +170,7 @@ public class MakespanMain {
         int minInt = 0, maxInt = 0;
         double minD = 0, maxD = 0;
         if (type == ChromosomeType.BINARY) {
-            chromosome = factory.createChromosome(type, numJobs, null, null);
+            chromosome = factory.createChromosome(type, numJobs, 0, numMachines - 1);
         } else if (type == ChromosomeType.INTEGER) {
             minInt = 0;
             maxInt = numJobs - 1;
@@ -195,7 +195,7 @@ public class MakespanMain {
                 params
         );
         switch (type) {
-            case BINARY -> ga.initializePopulation(type, numJobs, 0, 1);
+            case BINARY -> ga.initializePopulation(type, numJobs, 0, numMachines - 1);
             case INTEGER -> ga.initializePopulation(type, numJobs, 0, numMachines - 1);
             case FLOATING_POINT -> ga.initializePopulation(type, numJobs, 0, 1);
         }
