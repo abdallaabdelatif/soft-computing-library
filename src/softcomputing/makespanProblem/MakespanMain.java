@@ -61,9 +61,6 @@ public class MakespanMain {
     private static GeneticAlgorithm buildAlgorithm(GAParameters params) {
         Scanner sc = new Scanner(System.in);
 
-        // =============================================================
-        // Selection method
-        // =============================================================
         System.out.println("Choose selection method:");
         System.out.println("1. Tournament Selection");
         System.out.println("2. Roulette Wheel Selection");
@@ -76,9 +73,6 @@ public class MakespanMain {
             selection = new RouletteWheelSelection();
         }
 
-        // =============================================================
-        // Crossover method
-        // =============================================================
         System.out.println("Choose crossover method:");
         System.out.println("1. Single Point");
         System.out.println("2. N Point");
@@ -94,9 +88,6 @@ public class MakespanMain {
             crossover = new UniformCrossover();
         }
 
-        // =============================================================
-        // Mutation method
-        // =============================================================
         System.out.println("Choose mutation method:");
         System.out.println("1. Bit Flip (Binary)");
         System.out.println("2. Swap (Integer, for permutations)");
@@ -143,10 +134,7 @@ public class MakespanMain {
             mutation = new SwapMutation(); // default
         }
 
-        
-        // =============================================================
-        // Replacement method
-        // =============================================================
+
         System.out.println("Choose replacement method:");
         System.out.println("1. Survival of the fittest");
         System.out.println("2. Steady-State");
@@ -164,9 +152,6 @@ public class MakespanMain {
         }
 
 
-        // =============================================================
-        // Job & Machine setup
-        // =============================================================
         System.out.print("Enter number of jobs: ");
         int numJobs = sc.nextInt();
 
@@ -184,18 +169,12 @@ public class MakespanMain {
         for (int i = 0; i < numMachines; i++) {
             machines.add(new Machine(i));
         }
-        
-        // =============================================================
-        // Chromosome representation
-        // =============================================================
+
         System.out.println("Choose chromosome representation:");
         System.out.println("1. Binary");
         System.out.println("2. Integer");
         System.out.println("3. Floating Point");
         int chromChoice = sc.nextInt();
-
-//        System.out.print("Enter number of genes (jobs): ");
-//        int geneLength = sc.nextInt();
 
         ChromosomeFactory factory = new ChromosomeFactory();
 
@@ -211,24 +190,11 @@ public class MakespanMain {
         if (type == ChromosomeType.BINARY) {
             chromosome = factory.createChromosome(type, numJobs, null, null);
         } else if (type == ChromosomeType.INTEGER) {
-//            System.out.print("Enter minimum integer gene value: ");
-//            minInt = sc.nextInt();
-//            System.out.print("Enter maximum integer gene value: ");
-//            maxInt = sc.nextInt();
             chromosome = factory.createChromosome(type, numJobs, 0, numMachines - 1);
         } else {
-//            System.out.print("Enter minimum floating-point gene value: ");
-//            minD = sc.nextDouble();
-//            System.out.print("Enter maximum floating-point gene value: ");
-//            maxD = sc.nextDouble();
             chromosome = factory.createChromosome(type, numJobs, 0, 1);
         }
 
-
-
-        // =============================================================
-        // Fitness and GA setup
-        // =============================================================
         FitnessFunction fitness = new JobSchedulingFitness(jobs, machines);
 
         GeneticAlgorithm ga = new GeneticAlgorithm(

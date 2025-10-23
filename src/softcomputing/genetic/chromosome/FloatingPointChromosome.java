@@ -38,7 +38,7 @@ public class FloatingPointChromosome implements Chromosome<Double> {
     @Override
     public void randomizeGenes(Random random) {
         for (int i = 0; i < genes.length; i++) {
-            genes[i] = minValue + (maxValue - minValue) * random.nextDouble();
+            genes[i] = random.nextDouble();
         }
     }
 

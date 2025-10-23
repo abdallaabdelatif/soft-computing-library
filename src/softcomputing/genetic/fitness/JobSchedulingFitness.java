@@ -21,7 +21,7 @@ public class JobSchedulingFitness<T> implements FitnessFunction<T> {
         for (Machine m : machines) {
             m.getAssignedJobs().clear();
         }
-        for (int i = 0; i < jobs.size(); i++) {
+        for (int i = 0; i < genes.length; i++) {
             int machineIndex;
 
             if (genes[i] instanceof Integer) {
