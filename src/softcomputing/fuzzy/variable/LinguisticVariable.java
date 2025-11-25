@@ -40,4 +40,11 @@ public class LinguisticVariable {
         }
         return memberships;
     }
+    public double getDomainMin() {
+        return rangeStart;
+    }
+
+    public double getDomainMax() {
+        return rangeEnd;
+    }
 }
