@@ -6,6 +6,9 @@ public class TriangularMF implements MembershipFunction {
     private double c; // right point
 
     public TriangularMF(double a, double b, double c) {
+        if (a > b || b > c) {
+            throw new IllegalArgumentException("Invalid triangular MF points must have: a <= b <= c");
+        }
         this.a = a;
         this.b = b;
         this.c = c;
@@ -13,7 +16,19 @@ public class TriangularMF implements MembershipFunction {
 
     @Override
     public double compute(double x) {
-        return 0;
+        if (x <= a || x >= c) {
+            return 0.0;
+        }
+        if (x > a && x < b) {
+            return (x - a) / (b - a);
+        }
+        if (x == b) {
+            return 1.0;
+        }
+        if (x > b && x < c) {
+            return (c - x) / (c - b);
+        }
+        return 0.0;
     }
 
     @Override
