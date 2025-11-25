@@ -27,4 +27,17 @@ public class LinguisticVariable {
     public Map<String, FuzzySet> getFuzzySets() {
         return fuzzySets;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public Map<String, Double> fuzzify(double x) {
+        Map<String, Double> memberships = new LinkedHashMap<>();
+        double clamped = Math.max(rangeStart, Math.min(rangeEnd, x));
+        for (FuzzySet set : fuzzySets.values()) {
+            memberships.put(set.getName(), set.computeMembership(clamped));
+        }
+        return memberships;
+    }
 }
