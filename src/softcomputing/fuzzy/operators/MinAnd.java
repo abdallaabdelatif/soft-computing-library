@@ -4,6 +4,6 @@ public class MinAnd implements AndOperator {
 
     @Override
     public double apply(double a, double b) {
-        return 0;
+        return Math.min(a,b);
     }
 }
