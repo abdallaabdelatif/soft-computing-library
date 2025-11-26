@@ -2,6 +2,7 @@ package softcomputing.fuzzy.pipeline;
 
 import softcomputing.fuzzy.defuzzification.Defuzzifier;
 import softcomputing.fuzzy.inference.InferenceEngine;
+import softcomputing.fuzzy.inference.SugenoEngine;
 import softcomputing.fuzzy.rules.RuleBase;
 import softcomputing.fuzzy.variable.LinguisticVariable;
 
@@ -59,9 +60,24 @@ public class FuzzySystem {
 
         System.out.println("Fuzzified inputs: " + fuzzyInputs);
 
-
         Map<String, double[]> ruleOutputs =
                 inferenceEngine.infer(fuzzyInputs, ruleBase, outputVariable);
+
+        if (inferenceEngine instanceof SugenoEngine) {
+
+            double weightedSum = 0;
+            double weightTotal = 0;
+
+            for (double[] arr : ruleOutputs.values()) {
+                double weight = arr[0];
+                double z = arr[1];
+                weightedSum += weight * z;
+                weightTotal += weight;
+            }
+
+            if (weightTotal == 0) return 0;
+            return weightedSum / weightTotal;  // Sugeno weighted average output
+        }
 
         double[] aggregated =
                 aggregator.aggregateMamdani(ruleOutputs);
@@ -72,6 +88,7 @@ public class FuzzySystem {
                 outputVariable.getDomainMax()
         );
     }
+
 
 
     public double evaluate(double in1, double in2) {
