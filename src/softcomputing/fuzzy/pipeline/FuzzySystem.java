@@ -15,9 +15,9 @@ public class FuzzySystem {
 
     private final RuleBase ruleBase;
     private final Fuzzifier fuzzifier;
-    private final InferenceEngine inferenceEngine;
+    private  InferenceEngine inferenceEngine;
     private final Aggregator aggregator;
-    private final Defuzzifier defuzzifier;
+    private  Defuzzifier defuzzifier;
 
     public FuzzySystem(Fuzzifier fuzzifier,
                        InferenceEngine inferenceEngine,
@@ -93,4 +93,20 @@ public class FuzzySystem {
 
         return evaluate(map);
     }
+    public InferenceEngine getInferenceEngine() {
+        return inferenceEngine;
+    }
+
+    public void setInferenceEngine(InferenceEngine inferenceEngine) {
+        this.inferenceEngine = inferenceEngine;
+    }
+
+    public Defuzzifier getDefuzzifier() {
+        return defuzzifier;
+    }
+
+    public void setDefuzzifier(Defuzzifier defuzzifier) {
+        this.defuzzifier = defuzzifier;
+    }
+
 }
