@@ -4,8 +4,8 @@ public class CentroidDefuzzifier implements Defuzzifier {
 
     @Override
     public double defuzzify(double[] aggregatedOutput, double rangeStart, double rangeEnd) {
-        if (aggregatedOutput.length == 0) {
-            throw new IllegalArgumentException("Membership array cannot be empty.");
+        if (aggregatedOutput.length == 0 || aggregatedOutput == null) {
+            throw new IllegalArgumentException("Aggregated curve is empty.");
         }
 
         int n = aggregatedOutput.length;

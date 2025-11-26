@@ -11,6 +11,9 @@ public class LinguisticVariable {
     private Map<String, FuzzySet> fuzzySets = new LinkedHashMap<>();
 
     public LinguisticVariable(String name, double rangeStart, double rangeEnd) {
+        if (rangeEnd <= rangeStart) {
+            throw new IllegalArgumentException("rangeEnd > rangeStart is required");
+        }
         this.name = name;
         this.rangeStart = rangeStart;
         this.rangeEnd = rangeEnd;
@@ -32,19 +35,20 @@ public class LinguisticVariable {
         return name;
     }
 
-    public Map<String, Double> fuzzify(double x) {
-        Map<String, Double> memberships = new LinkedHashMap<>();
-        double clamped = Math.max(rangeStart, Math.min(rangeEnd, x));
-        for (FuzzySet set : fuzzySets.values()) {
-            memberships.put(set.getName(), set.computeMembership(clamped));
-        }
-        return memberships;
-    }
     public double getDomainMin() {
         return rangeStart;
     }
 
     public double getDomainMax() {
         return rangeEnd;
+    }
+
+
+    public Map<String, Double> fuzzify(double x) {
+        Map<String, Double> out = new LinkedHashMap<>();
+        for(Map.Entry<String, FuzzySet> set : fuzzySets.entrySet()) {
+            out.put(set.getKey(), set.getValue().computeMembership(x));
+        }
+        return out;
     }
 }

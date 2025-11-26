@@ -8,7 +8,7 @@ import softcomputing.fuzzy.variable.LinguisticVariable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FuzzySystem implements IFuzzySystem {
+public class FuzzySystem {
 
     private final Map<String, LinguisticVariable> inputVariables = new HashMap<>();
     private LinguisticVariable outputVariable;
@@ -32,37 +32,39 @@ public class FuzzySystem implements IFuzzySystem {
         this.ruleBase = ruleBase;
     }
 
-    @Override
     public void addInputVariable(LinguisticVariable var) {
         inputVariables.put(var.getName(), var);
     }
 
-    @Override
+
     public void setOutputVariable(LinguisticVariable var) {
         this.outputVariable = var;
     }
 
-    @Override
+
     public Map<String, LinguisticVariable> getInputVariables() {
         return inputVariables;
     }
 
-    @Override
+
     public LinguisticVariable getOutputVariable() {
         return outputVariable;
     }
 
-    @Override
+
     public double evaluate(Map<String, Double> crispInputs) {
 
         Map<String, Map<String, Double>> fuzzyInputs =
                 fuzzifier.fuzzify(crispInputs, inputVariables);
 
+        System.out.println("Fuzzified inputs: " + fuzzyInputs);
+
+
         Map<String, double[]> ruleOutputs =
                 inferenceEngine.infer(fuzzyInputs, ruleBase, outputVariable);
 
         double[] aggregated =
-                aggregator.aggregateMamdani(ruleBase, ruleOutputs);
+                aggregator.aggregateMamdani(ruleOutputs);
 
         return defuzzifier.defuzzify(
                 aggregated,
@@ -71,7 +73,7 @@ public class FuzzySystem implements IFuzzySystem {
         );
     }
 
-    @Override
+
     public double evaluate(double in1, double in2) {
         String[] keys = inputVariables.keySet().toArray(new String[0]);
 
@@ -82,7 +84,7 @@ public class FuzzySystem implements IFuzzySystem {
         return evaluate(map);
     }
 
-    @Override
+
     public double evaluate(double input) {
         String key = inputVariables.keySet().iterator().next();
 
