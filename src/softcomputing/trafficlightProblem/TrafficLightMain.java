@@ -53,7 +53,7 @@ public class TrafficLightMain {
 
             Map<String,String> cond2 = new LinkedHashMap<>();
             cond2.put("TrafficDensity","Medium");
-            cond2.put("WaitingTime","Short");
+            cond2.put("WaitingTime","Medium");
             ruleBase.addRule(new FuzzyRule(new RuleAntecedent(cond2),
                     new RuleConsequent("GreenDuration","Medium")));
 
@@ -62,6 +62,18 @@ public class TrafficLightMain {
             cond3.put("WaitingTime","Short");
             ruleBase.addRule(new FuzzyRule(new RuleAntecedent(cond3),
                     new RuleConsequent("GreenDuration","Short")));
+
+            Map<String,String> cond4 = new LinkedHashMap<>();
+            cond4.put("TrafficDensity","High");
+            cond4.put("WaitingTime","Short");
+            ruleBase.addRule(new FuzzyRule(new RuleAntecedent(cond4),
+                    new RuleConsequent("GreenDuration","Medium")));
+
+            Map<String,String> cond5 = new LinkedHashMap<>();
+            cond5.put("TrafficDensity","Low");
+            cond5.put("WaitingTime","Long");
+            ruleBase.addRule(new FuzzyRule(new RuleAntecedent(cond5),
+                    new RuleConsequent("GreenDuration","Medium")));
 
             RuleBaseTXT.saveToTxt(ruleBase, "rules.txt");
         }
@@ -167,7 +179,7 @@ public class TrafficLightMain {
 
                         if (!var.equalsIgnoreCase("TrafficDensity") &&
                                 !var.equalsIgnoreCase("WaitingTime")) {
-                            System.out.println("❌ Invalid variable name.");
+                            System.out.println("Invalid variable name.");
                             continue;
                         }
 
@@ -230,7 +242,7 @@ public class TrafficLightMain {
                     } else if (enabledInput.equalsIgnoreCase("false")) {
                         enabled = false;
                     } else {
-                        System.out.println("⚠ Invalid input. Defaulting to true.");
+                        System.out.println("Invalid input. Defaulting to true.");
                         enabled = true;
                     }
 
@@ -245,11 +257,11 @@ public class TrafficLightMain {
                         try {
                             weight = Double.parseDouble(weightInput);
                             if (weight < 0 || weight > 1) {
-                                System.out.println("⚠ Invalid weight. Using default 1.0.");
+                                System.out.println("Invalid weight. Using default 1.0.");
                                 weight = 1.0;
                             }
                         } catch (Exception e) {
-                            System.out.println("⚠ Invalid number. Using default 1.0.");
+                            System.out.println("Invalid number. Using default 1.0.");
                             weight = 1.0;
                         }
                     }
@@ -266,7 +278,7 @@ public class TrafficLightMain {
 
                     RuleBaseTXT.saveToTxt(ruleBase, "rules.txt");
 
-                    System.out.println("✅ Rule added and saved successfully!");
+                    System.out.println("Rule added and saved successfully!");
                     break;
 
 

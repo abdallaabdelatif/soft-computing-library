@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class MamdaniEngine implements InferenceEngine {
 
-    private static final int NUM_SAMPLES = 101;
+    private static final int NUM_SAMPLES = 121;
 
     @Override
     public Map<String, double[]> infer(
@@ -49,15 +49,15 @@ public class MamdaniEngine implements InferenceEngine {
                 continue;
             }
 
-            double firingStrength = computeFiringStrength(fuzzifiedInputs, antecedent);
+            double evaluation = ruleEvaluation(fuzzifiedInputs, antecedent);
 
-            if (firingStrength <= 0.0) {
+            if (evaluation <= 0.0) {
                 continue;
             }
 
-            firingStrength *= rule.getWeight();
+            evaluation *= rule.getWeight();
 
-            if (firingStrength <= 0.0) {
+            if (evaluation <= 0.0) {
                 continue;
             }
 
@@ -73,7 +73,7 @@ public class MamdaniEngine implements InferenceEngine {
             for (int i = 0; i < NUM_SAMPLES; i++) {
                 double x = rangeStart + i * step;
                 double baseMu = mf.compute(x);
-                curve[i] = Math.min(firingStrength, baseMu);
+                curve[i] = Math.min(evaluation, baseMu);
             }
 
             String key = "rule_" + ruleIndex + "_" + consequent.getOutputFuzzySet();
@@ -84,7 +84,7 @@ public class MamdaniEngine implements InferenceEngine {
         return ruleOutputs;
     }
 
-    private double computeFiringStrength(
+    private double ruleEvaluation(
             Map<String, Map<String, Double>> fuzzifiedInputs,
             RuleAntecedent antecedent) {
 
@@ -93,7 +93,7 @@ public class MamdaniEngine implements InferenceEngine {
             return 0.0;
         }
 
-        double firingStrength = 1.0;
+        double evaluation = 1.0;
 
         for (Map.Entry<String, String> entry : conditions.entrySet()) {
             String varName = entry.getKey();
@@ -109,13 +109,13 @@ public class MamdaniEngine implements InferenceEngine {
                 return 0.0;
             }
 
-            firingStrength = Math.min(firingStrength, mu);
+            evaluation = Math.min(evaluation, mu);
 
-            if (firingStrength <= 0.0) {
+            if (evaluation <= 0.0) {
                 return 0.0;
             }
         }
 
-        return firingStrength;
+        return evaluation;
     }
 }
