@@ -1,0 +1,5 @@
+TrafficDensity=High,WaitingTime=Long;GreenDuration=Long;enabled=true;weight=1.0
+TrafficDensity=Medium,WaitingTime=Medium;GreenDuration=Medium;enabled=true;weight=1.0
+TrafficDensity=Low,WaitingTime=Short;GreenDuration=Short;enabled=true;weight=1.0
+TrafficDensity=High,WaitingTime=Short;GreenDuration=Medium;enabled=true;weight=1.0
+TrafficDensity=Low,WaitingTime=Long;GreenDuration=Medium;enabled=true;weight=1.0

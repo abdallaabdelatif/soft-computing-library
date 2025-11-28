@@ -26,17 +26,17 @@ public class TrafficLightMain {
         LinguisticVariable density = new LinguisticVariable("TrafficDensity", 0, 100);
         density.addFuzzySet(new FuzzySet("Low", new TriangularMF(0, 0, 30)));
         density.addFuzzySet(new FuzzySet("Medium", new TrapezoidalMF(20, 35, 65, 80)));
-        density.addFuzzySet(new FuzzySet("High", new TriangularMF(60, 100, 100)));
+        density.addFuzzySet(new FuzzySet("High", new TriangularMF(60, 100, 101)));
 
         LinguisticVariable waiting = new LinguisticVariable("WaitingTime", 0, 180);
         waiting.addFuzzySet(new FuzzySet("Short", new TriangularMF(0, 0, 60)));
         waiting.addFuzzySet(new FuzzySet("Medium", new TrapezoidalMF(50, 70, 110, 130)));
-        waiting.addFuzzySet(new FuzzySet("Long", new TriangularMF(110, 180, 180)));
+        waiting.addFuzzySet(new FuzzySet("Long", new TriangularMF(110, 180, 181)));
 
         LinguisticVariable green = new LinguisticVariable("GreenDuration", 0, 120);
         green.addFuzzySet(new FuzzySet("Short", new TriangularMF(0, 0, 40)));
         green.addFuzzySet(new FuzzySet("Medium", new TrapezoidalMF(30, 45, 65, 80)));
-        green.addFuzzySet(new FuzzySet("Long", new TriangularMF(70, 120, 120)));
+        green.addFuzzySet(new FuzzySet("Long", new TriangularMF(70, 120, 121)));
 
 
         RuleBase ruleBase = new RuleBase();
