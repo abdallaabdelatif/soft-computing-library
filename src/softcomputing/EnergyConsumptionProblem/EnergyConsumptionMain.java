@@ -58,7 +58,7 @@ public class EnergyConsumptionMain {
         ));
 
         //Training
-        nn.fit(train.X, train.y, 200);
+        nn.fit(train.X, train.y, 200, 32);
 
         //Evaluation
         double trainMSE = Metrics.mse(train.y, nn.predict(train.X));
