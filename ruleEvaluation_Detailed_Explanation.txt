@@ -1,0 +1,236 @@
+# Detailed Explanation of `ruleEvaluation()` Method in MamdaniEngine
+
+## **Purpose:**
+The `ruleEvaluation()` method computes the **firing strength** (activation level) of a rule's antecedent by combining the membership degrees of all conditions using the **minimum t-norm** (AND operation).
+
+---
+
+## **Method Signature:**
+```java
+private double ruleEvaluation(
+    Map<String, Map<String, Double>> fuzzifiedInputs,
+    RuleAntecedent antecedent)
+```
+
+**Inputs:**
+- `fuzzifiedInputs`: A map containing membership degrees for all input variables and their fuzzy sets
+- `antecedent`: The IF part of a fuzzy rule (the conditions to evaluate)
+
+**Output:**
+- `double`: The firing strength value in the range [0.0, 1.0]
+
+---
+
+## **Step-by-Step Breakdown:**
+
+### **Step 1: Extract Conditions (Lines 91-94)**
+```java
+Map<String, String> conditions = antecedent.getConditions();
+if (conditions == null || conditions.isEmpty()) {
+    return 0.0;
+}
+```
+- Gets the conditions map from the antecedent
+- The map structure is: `{variableName: fuzzySetName}`
+- Example: `{"TrafficDensity": "High", "WaitingTime": "Long"}`
+- If the conditions map is empty or null, returns 0.0 (rule doesn't fire)
+
+### **Step 2: Initialize Evaluation (Line 96)**
+```java
+double evaluation = 1.0;
+```
+- Initializes the evaluation to 1.0 (neutral value for AND operation)
+- This will be reduced by the minimum operation as we process each condition
+
+### **Step 3: Iterate Through Each Condition (Lines 98-116)**
+```java
+for (Map.Entry<String, String> entry : conditions.entrySet()) {
+    String varName = entry.getKey();      // e.g., "TrafficDensity"
+    String setName = entry.getValue();    // e.g., "High"
+```
+
+**For each condition in the rule:**
+
+#### **3a. Look Up the Variable's Memberships (Lines 102-105)**
+```java
+Map<String, Double> membershipsForVar = fuzzifiedInputs.get(varName);
+if (membershipsForVar == null) {
+    return 0.0;
+}
+```
+- Retrieves the membership map for the specific input variable
+- Example: `fuzzifiedInputs.get("TrafficDensity")` might return `{"Low": 0.0, "Medium": 0.3, "High": 0.7}`
+- If the variable doesn't exist in fuzzified inputs, returns 0.0 (rule doesn't fire)
+
+#### **3b. Get the Specific Fuzzy Set's Membership (Lines 107-110)**
+```java
+Double mu = membershipsForVar.get(setName);
+if (mu == null) {
+    return 0.0;
+}
+```
+- Extracts the membership degree for the specific fuzzy set required by the condition
+- Example: `membershipsForVar.get("High")` returns `0.7`
+- If the fuzzy set doesn't exist, returns 0.0 (rule doesn't fire)
+
+#### **3c. Apply Minimum T-Norm (Line 112)**
+```java
+evaluation = Math.min(evaluation, mu);
+```
+- This is the core operation: **minimum t-norm** (fuzzy AND)
+- Updates the evaluation to be the minimum of the current evaluation and the current membership degree
+- This implements the logical AND: the rule fires at the strength of the **weakest** condition
+
+#### **3d. Early Termination Optimization (Lines 114-116)**
+```java
+if (evaluation <= 0.0) {
+    return 0.0;
+}
+```
+- If the evaluation becomes 0, immediately returns 0.0
+- This is an optimization: if any condition has zero membership, the rule won't fire regardless of other conditions
+- No need to check remaining conditions
+
+### **Step 4: Return Final Evaluation (Line 119)**
+```java
+return evaluation;
+```
+- Returns the final firing strength (the minimum of all condition memberships)
+
+---
+
+## **Mathematical Concept:**
+
+The method implements the **minimum t-norm** for fuzzy AND:
+
+\[
+\alpha_r = \min_{i=1}^{n} \mu_{A_i}(x_i)
+\]
+
+Where:
+- \(\alpha_r\) = rule firing strength
+- \(n\) = number of conditions
+- \(\mu_{A_i}(x_i)\) = membership degree of condition \(i\)
+
+---
+
+## **Concrete Example:**
+
+**Scenario:**
+- Rule: `IF TrafficDensity IS High AND WaitingTime IS Long THEN GreenDuration IS Long`
+- Fuzzified inputs:
+  ```java
+  {
+    "TrafficDensity": {"Low": 0.0, "Medium": 0.3, "High": 0.7},
+    "WaitingTime": {"Short": 0.0, "Medium": 0.2, "Long": 0.9}
+  }
+  ```
+- Antecedent conditions: `{"TrafficDensity": "High", "WaitingTime": "Long"}`
+
+**Execution Trace:**
+
+1. **Initialize:** `evaluation = 1.0`
+
+2. **First condition:** `TrafficDensity = "High"`
+   - Lookup: `mu = 0.7`
+   - Update: `evaluation = min(1.0, 0.7) = 0.7`
+
+3. **Second condition:** `WaitingTime = "Long"`
+   - Lookup: `mu = 0.9`
+   - Update: `evaluation = min(0.7, 0.9) = 0.7`
+
+4. **Return:** `0.7`
+
+**Result:** The rule fires at strength 0.7 (limited by the weakest condition, which is TrafficDensity=High at 0.7).
+
+---
+
+## **Another Example (Showing Early Termination):**
+
+**Scenario:**
+- Same rule, but: `TrafficDensity = "High"` → `0.0` (not high at all)
+- Fuzzified inputs:
+  ```java
+  {
+    "TrafficDensity": {"Low": 0.8, "Medium": 0.2, "High": 0.0},
+    "WaitingTime": {"Short": 0.0, "Medium": 0.2, "Long": 0.9}
+  }
+  ```
+
+**Execution Trace:**
+
+1. **Initialize:** `evaluation = 1.0`
+
+2. **First condition:** `TrafficDensity = "High"`
+   - Lookup: `mu = 0.0`
+   - Update: `evaluation = min(1.0, 0.0) = 0.0`
+   - Check: `evaluation <= 0.0` → **true**
+   - **Early return:** `0.0`
+
+**Result:** The rule doesn't fire because the first condition is not satisfied at all.
+
+---
+
+## **Key Design Decisions:**
+
+1. **Minimum t-norm:** Uses conservative AND operation - rule strength equals weakest condition
+2. **Early termination:** If any condition is 0, return 0 immediately (optimization)
+3. **Error handling:** Missing variables or fuzzy sets return 0.0 (rule doesn't fire)
+4. **Initialization at 1.0:** Neutral starting point for AND operation
+
+---
+
+## **Why This Matters:**
+
+The firing strength determines how much the rule contributes to the final output:
+- In **Mamdani**: It clips the output membership function at this strength
+- In **Sugeno**: It weights the crisp output value
+- Higher firing strength = stronger rule contribution
+
+This method is the core of rule evaluation in both Mamdani and Sugeno engines (they use the same logic for antecedent evaluation).
+
+---
+
+## **Code Reference:**
+
+```java
+private double ruleEvaluation(
+        Map<String, Map<String, Double>> fuzzifiedInputs,
+        RuleAntecedent antecedent) {
+
+    Map<String, String> conditions = antecedent.getConditions();
+    if (conditions == null || conditions.isEmpty()) {
+        return 0.0;
+    }
+
+    double evaluation = 1.0;
+
+    for (Map.Entry<String, String> entry : conditions.entrySet()) {
+        String varName = entry.getKey();
+        String setName = entry.getValue();
+
+        Map<String, Double> membershipsForVar = fuzzifiedInputs.get(varName);
+        if (membershipsForVar == null) {
+            return 0.0;
+        }
+
+        Double mu = membershipsForVar.get(setName);
+        if (mu == null) {
+            return 0.0;
+        }
+
+        evaluation = Math.min(evaluation, mu);
+
+        if (evaluation <= 0.0) {
+            return 0.0;
+        }
+    }
+
+    return evaluation;
+}
+```
+
+---
+
+*Document generated from detailed explanation of MamdaniEngine.ruleEvaluation() method*
+
