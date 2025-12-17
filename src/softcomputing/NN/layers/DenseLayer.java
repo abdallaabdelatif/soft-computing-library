@@ -57,4 +57,12 @@ public class DenseLayer implements Layer {
 
         return Matrix.multiply(gradZ, Matrix.transpose(weights));
     }
+
+    public double[][] getLastZ() {
+        return zCache;
+    }
+
+    public double[][] getLastInput() {
+        return inputCache;
+   }
 }
