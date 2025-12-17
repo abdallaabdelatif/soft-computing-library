@@ -1,5 +1,6 @@
 package softcomputing.NN.intialization;
 
-public class WeightIntializer {
-    
+public interface WeightIntializer {
+    double[][] initialize(int rows, int cols);
+
 }
