@@ -9,6 +9,7 @@ public class NeuralNetwork {
     private List<Layer> layers;
     private LossFunction loss;
     private double learningRate;
+    private java.util.List<Double> lossHistory = new java.util.ArrayList<>();
 
     public NeuralNetwork() {
         layers = new ArrayList<>();
@@ -37,6 +38,7 @@ public class NeuralNetwork {
             }
 
             double lossValue = loss.compute(y, output);
+            lossHistory.add(lossValue);
             double[][] grad = loss.derivative(y, output);
 
             for (int i = layers.size() - 1; i >= 0; i--) {
@@ -56,4 +58,9 @@ public class NeuralNetwork {
         }
         return output;
     }
+    
+    public java.util.List<Double> getLossHistory() {
+        return lossHistory;
+    }
+
 }
