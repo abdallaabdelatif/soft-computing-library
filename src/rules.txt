@@ -1,9 +1,5 @@
 TrafficDensity=High,WaitingTime=Long;GreenDuration=Long;enabled=true;weight=1.0
-<<<<<<< HEAD
-TrafficDensity=Medium,WaitingTime=Short;GreenDuration=Medium;enabled=true;weight=1.0
-=======
 TrafficDensity=Medium,WaitingTime=Medium;GreenDuration=Medium;enabled=true;weight=1.0
->>>>>>> e30e7dc4edfd40deb6e4134a5fb428403ece6ed1
 TrafficDensity=Low,WaitingTime=Short;GreenDuration=Short;enabled=true;weight=1.0
 TrafficDensity=High,WaitingTime=Short;GreenDuration=Medium;enabled=true;weight=1.0
 TrafficDensity=Low,WaitingTime=Long;GreenDuration=Medium;enabled=true;weight=1.0

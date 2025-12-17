@@ -7,10 +7,9 @@ public class TrainingConfig {
 
     public TrainingConfig() {}
 
-    public TrainingConfig(int epochs, double learningRate) {
-        this.epochs = epochs;
-        this.learningRate = learningRate;
-        this.batchSize = batchSize;
-
-    }
+    public TrainingConfig(int epochs, double learningRate, int batchSize) {
+    this.epochs = epochs;
+    this.learningRate = learningRate;
+    this.batchSize = batchSize;
+  }
 }
