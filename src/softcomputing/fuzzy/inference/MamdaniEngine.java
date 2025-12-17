@@ -80,7 +80,7 @@ public class MamdaniEngine implements InferenceEngine {
             ruleOutputs.put(key, curve);
             ruleIndex++;
         }
-
+xg
         return ruleOutputs;
     }
 

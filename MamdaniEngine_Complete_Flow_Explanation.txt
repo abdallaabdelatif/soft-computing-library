@@ -1,0 +1,621 @@
+# Complete Flow Explanation of MamdaniEngine with Examples
+
+## **Overview**
+
+The `MamdaniEngine` implements **Mamdani fuzzy inference**, which is a method for processing fuzzy rules to produce fuzzy outputs. It evaluates each rule, computes firing strengths, and generates discretized membership functions (curves) that represent the fuzzy output of each rule.
+
+---
+
+## **Method Signature**
+
+```java
+public Map<String, double[]> infer(
+    Map<String, Map<String, Double>> fuzzifiedInputs,
+    RuleBase ruleBase,
+    LinguisticVariable outputVar)
+```
+
+### **Inputs:**
+
+1. **`fuzzifiedInputs`**: `Map<String, Map<String, Double>>`
+   - Outer key: Input variable name (e.g., "TrafficDensity")
+   - Inner map: Fuzzy set name → Membership degree
+   - Example:
+     ```java
+     {
+       "TrafficDensity": {"Low": 0.0, "Medium": 0.3, "High": 0.7},
+       "WaitingTime": {"Short": 0.0, "Medium": 0.2, "Long": 0.9}
+     }
+     ```
+
+2. **`ruleBase`**: `RuleBase`
+   - Collection of fuzzy rules to evaluate
+   - Each rule has an antecedent (IF part) and consequent (THEN part)
+
+3. **`outputVar`**: `LinguisticVariable`
+   - The output linguistic variable (e.g., GreenDuration)
+   - Contains fuzzy sets for the output domain
+
+### **Output:**
+
+- **`Map<String, double[]>`**
+  - Key: Rule identifier (e.g., "rule_0_Long")
+  - Value: `double[121]` array representing a discretized membership function
+  - Each array contains 121 sampled points over the output domain
+
+---
+
+## **Complete Step-by-Step Flow**
+
+### **Step 1: Initialize Result Map (Line 24)**
+
+```java
+Map<String, double[]> ruleOutputs = new LinkedHashMap<>();
+```
+
+- Creates an empty map to store rule outputs
+- Uses `LinkedHashMap` to preserve rule order
+
+---
+
+### **Step 2: Validate Rule Base (Lines 26-28)**
+
+```java
+if (ruleBase == null || ruleBase.getRules().isEmpty()) {
+    return ruleOutputs;  // Return empty map
+}
+```
+
+- Early return if no rules exist
+- Prevents unnecessary processing
+
+---
+
+### **Step 3: Extract Output Domain Range (Lines 30-35)**
+
+```java
+double rangeStart = outputVar.getDomainMin();
+double rangeEnd = outputVar.getDomainMax();
+
+if (rangeEnd <= rangeStart) {
+    throw new IllegalArgumentException("Output variable domain must have rangeEnd > rangeStart.");
+}
+```
+
+- Gets the output variable's domain range
+- Example: GreenDuration domain [0, 120] → `rangeStart = 0`, `rangeEnd = 120`
+- Validates that the range is valid
+
+---
+
+### **Step 4: Calculate Sampling Step Size (Line 37)**
+
+```java
+double step = (rangeEnd - rangeStart) / (NUM_SAMPLES - 1);
+```
+
+- `NUM_SAMPLES = 121` (constant defined at line 16)
+- Calculates the step size for discretizing the output domain
+- Example: For domain [0, 120]: `step = (120 - 0) / (121 - 1) = 120 / 120 = 1.0`
+- This means we sample at points: 0, 1, 2, 3, ..., 120 (121 points total)
+
+---
+
+### **Step 5: Process Each Rule (Lines 39-82)**
+
+```java
+int ruleIndex = 0;
+for (FuzzyRule rule : ruleBase.getRules()) {
+```
+
+**For each rule in the rule base, perform the following:**
+
+#### **5a. Skip Null or Disabled Rules (Lines 41-43)**
+
+```java
+if (rule == null || !rule.isEnabled()) {
+    continue;
+}
+```
+
+- Only processes enabled rules
+- Allows rules to be temporarily disabled without deletion
+
+#### **5b. Extract Antecedent and Consequent (Lines 45-50)**
+
+```java
+RuleAntecedent antecedent = rule.getAntecedent();
+RuleConsequent consequent = rule.getConsequent();
+
+if (antecedent == null || consequent == null) {
+    continue;
+}
+```
+
+- Gets the IF part (antecedent) and THEN part (consequent) of the rule
+- Skips rules with missing components
+
+#### **5c. Compute Rule Evaluation (Firing Strength) (Line 52)**
+
+```java
+double evaluation = ruleEvaluation(fuzzifiedInputs, antecedent);
+```
+
+- Calls `ruleEvaluation()` method to compute firing strength
+- This method uses **minimum t-norm** to combine all antecedent conditions
+- Returns a value in [0.0, 1.0] representing how well the rule matches the inputs
+
+**How `ruleEvaluation()` works:**
+- Extracts conditions from antecedent (e.g., `{"TrafficDensity": "High", "WaitingTime": "Long"}`)
+- For each condition, looks up membership degree in `fuzzifiedInputs`
+- Applies minimum operation: `evaluation = min(evaluation, mu)`
+- Returns the minimum of all condition memberships
+
+#### **5d. Skip Rules with Zero Firing Strength (Lines 54-56)**
+
+```java
+if (evaluation <= 0.0) {
+    continue;
+}
+```
+
+- If the rule doesn't fire (evaluation = 0), skip it
+- No need to process rules that don't contribute
+
+#### **5e. Apply Rule Weight (Line 58)**
+
+```java
+evaluation *= rule.getWeight();
+```
+
+- Multiplies firing strength by rule weight
+- Rule weight is typically in [0.0, 1.0] (default = 1.0)
+- Allows rules to be weighted differently (e.g., more important rules have higher weight)
+- Example: If `evaluation = 0.7` and `weight = 0.8`, then `evaluation = 0.56`
+
+#### **5f. Skip If Weighted Strength is Zero (Lines 60-62)**
+
+```java
+if (evaluation <= 0.0) {
+    continue;
+}
+```
+
+- Final check after applying weight
+- Ensures only active rules proceed
+
+#### **5g. Get Output Fuzzy Set (Lines 64-67)**
+
+```java
+FuzzySet outputSet = outputVar.getFuzzySet(consequent.getOutputFuzzySet());
+if (outputSet == null) {
+    continue;
+}
+```
+
+- Retrieves the fuzzy set specified in the rule's consequent
+- Example: If consequent says "Long", gets the "Long" fuzzy set from GreenDuration variable
+- Skips if the fuzzy set doesn't exist
+
+#### **5h. Get Membership Function (Line 69)**
+
+```java
+MembershipFunction mf = outputSet.getMembershipFunction();
+```
+
+- Extracts the membership function (Triangular, Trapezoidal, or Gaussian)
+- This defines the shape of the output fuzzy set
+
+#### **5i. Create the Output Curve (Mamdani Implication) (Lines 72-77)**
+
+```java
+double[] curve = new double[NUM_SAMPLES];
+for (int i = 0; i < NUM_SAMPLES; i++) {
+    double x = rangeStart + i * step;        // x value in output domain
+    double baseMu = mf.compute(x);          // Original membership at x
+    curve[i] = Math.min(evaluation, baseMu); // Clipped membership
+}
+```
+
+**This is the core of Mamdani inference:**
+
+- **Line 74**: Calculates the x-coordinate in the output domain
+  - Example: For `i = 0`: `x = 0 + 0 × 1.0 = 0`
+  - For `i = 60`: `x = 0 + 60 × 1.0 = 60`
+  - For `i = 120`: `x = 0 + 120 × 1.0 = 120`
+
+- **Line 75**: Computes the original membership of the output fuzzy set at point x
+  - Example: For "Long" fuzzy set at `x = 80`, `baseMu` might be `0.8`
+
+- **Line 76**: Applies **Mamdani implication** (clipping operation)
+  - Formula: `μ_output(x) = min(α, μ_consequent(x))`
+  - Where `α` = `evaluation` (firing strength)
+  - This clips the membership function at the firing strength level
+
+**Visual Representation:**
+
+**Before Clipping (Base Membership Function):**
+```
+Membership
+   1.0 |        /\
+       |       /  \
+   0.7 |      /    \
+       |     /      \
+   0.0 |____/        \____
+       0    40    80    120  (GreenDuration in seconds)
+```
+
+**After Clipping at `evaluation = 0.7`:**
+```
+Membership
+   1.0 |
+       |
+   0.7 |═══════════════════  ← Clipped at 0.7
+       |     /      \
+   0.0 |____/        \____
+       0    40    80    120  (GreenDuration in seconds)
+```
+
+#### **5j. Store Rule Output (Lines 79-81)**
+
+```java
+String key = "rule_" + ruleIndex + "_" + consequent.getOutputFuzzySet();
+ruleOutputs.put(key, curve);
+ruleIndex++;
+```
+
+- Creates a unique key for the rule (e.g., "rule_0_Long")
+- Stores the curve (121-point array) in the result map
+- Increments rule index for next rule
+
+---
+
+### **Step 6: Return All Rule Outputs (Line 84)**
+
+```java
+return ruleOutputs;
+```
+
+- Returns the map containing all active rule outputs
+- Each entry is a rule identifier → discretized membership function
+
+---
+
+## **Complete Example: Traffic Light Problem**
+
+### **Problem Setup:**
+
+**Input Variables:**
+- **TrafficDensity**: Domain [0, 100]
+  - Fuzzy sets: Low (Triangular: 0, 0, 30), Medium (Trapezoidal: 20, 35, 65, 80), High (Triangular: 60, 100, 100)
+- **WaitingTime**: Domain [0, 180]
+  - Fuzzy sets: Short (Triangular: 0, 0, 60), Medium (Trapezoidal: 50, 70, 110, 130), Long (Triangular: 110, 180, 180)
+
+**Output Variable:**
+- **GreenDuration**: Domain [0, 120]
+  - Fuzzy sets: Short (Triangular: 0, 0, 40), Medium (Trapezoidal: 30, 45, 65, 80), Long (Triangular: 70, 120, 120)
+
+**Rules:**
+1. `IF TrafficDensity IS High AND WaitingTime IS Long THEN GreenDuration IS Long`
+2. `IF TrafficDensity IS Medium AND WaitingTime IS Medium THEN GreenDuration IS Medium`
+3. `IF TrafficDensity IS Low AND WaitingTime IS Short THEN GreenDuration IS Short`
+
+---
+
+### **Example Execution:**
+
+**Input:** TrafficDensity = 75, WaitingTime = 90
+
+#### **Step 1: Fuzzification (Before MamdaniEngine)**
+
+```java
+fuzzifiedInputs = {
+    "TrafficDensity": {
+        "Low": 0.0,      // TrafficDensity=75 is not Low
+        "Medium": 0.3,  // TrafficDensity=75 has 0.3 membership in Medium
+        "High": 0.7     // TrafficDensity=75 has 0.7 membership in High
+    },
+    "WaitingTime": {
+        "Short": 0.0,    // WaitingTime=90 is not Short
+        "Medium": 0.4,   // WaitingTime=90 has 0.4 membership in Medium
+        "Long": 0.5      // WaitingTime=90 has 0.5 membership in Long
+    }
+}
+```
+
+#### **Step 2: Initialize MamdaniEngine**
+
+- `rangeStart = 0` (GreenDuration domain minimum)
+- `rangeEnd = 120` (GreenDuration domain maximum)
+- `step = (120 - 0) / (121 - 1) = 1.0`
+- `ruleOutputs = {}` (empty map)
+
+#### **Step 3: Process Rule 1**
+
+**Rule 1:** `IF TrafficDensity IS High AND WaitingTime IS Long THEN GreenDuration IS Long`
+
+**3a. Extract Components:**
+- Antecedent: `{"TrafficDensity": "High", "WaitingTime": "Long"}`
+- Consequent: `"Long"`
+
+**3b. Compute Firing Strength (`ruleEvaluation`):**
+- Condition 1: `TrafficDensity = "High"` → Lookup: `mu = 0.7`
+  - `evaluation = min(1.0, 0.7) = 0.7`
+- Condition 2: `WaitingTime = "Long"` → Lookup: `mu = 0.5`
+  - `evaluation = min(0.7, 0.5) = 0.5`
+- Final: `evaluation = 0.5` (limited by weakest condition)
+
+**3c. Apply Weight:**
+- Assume `rule.getWeight() = 1.0`
+- `evaluation = 0.5 × 1.0 = 0.5`
+
+**3d. Get Output Fuzzy Set:**
+- `outputSet = green.getFuzzySet("Long")`
+- "Long" is a TriangularMF(70, 120, 120)
+
+**3e. Create Curve (121 points):**
+
+For each `i` from 0 to 120:
+
+| i | x = 0 + i×1.0 | baseMu (Long set) | evaluation | curve[i] = min(0.5, baseMu) |
+|---|---------------|-------------------|------------|------------------------------|
+| 0 | 0 | 0.0 | 0.5 | 0.0 |
+| 30 | 30 | 0.0 | 0.5 | 0.0 |
+| 50 | 50 | 0.0 | 0.5 | 0.0 |
+| 70 | 70 | 0.0 | 0.5 | 0.0 |
+| 85 | 85 | 0.3 | 0.5 | **0.3** |
+| 95 | 95 | 0.5 | 0.5 | **0.5** |
+| 100 | 100 | 0.5 | 0.5 | **0.5** |
+| 110 | 110 | 0.5 | 0.5 | **0.5** |
+| 115 | 115 | 0.25 | 0.5 | **0.25** |
+| 120 | 120 | 0.0 | 0.5 | 0.0 |
+
+**3f. Store Output:**
+```java
+ruleOutputs.put("rule_0_Long", curve);  // curve is double[121]
+```
+
+#### **Step 4: Process Rule 2**
+
+**Rule 2:** `IF TrafficDensity IS Medium AND WaitingTime IS Medium THEN GreenDuration IS Medium`
+
+**4a. Extract Components:**
+- Antecedent: `{"TrafficDensity": "Medium", "WaitingTime": "Medium"}`
+- Consequent: `"Medium"`
+
+**4b. Compute Firing Strength:**
+- Condition 1: `TrafficDensity = "Medium"` → `mu = 0.3`
+  - `evaluation = min(1.0, 0.3) = 0.3`
+- Condition 2: `WaitingTime = "Medium"` → `mu = 0.4`
+  - `evaluation = min(0.3, 0.4) = 0.3`
+- Final: `evaluation = 0.3`
+
+**4c. Apply Weight:**
+- `evaluation = 0.3 × 1.0 = 0.3`
+
+**4d. Get Output Fuzzy Set:**
+- `outputSet = green.getFuzzySet("Medium")`
+- "Medium" is a TrapezoidalMF(30, 45, 65, 80)
+
+**4e. Create Curve:**
+
+For key points:
+
+| i | x | baseMu (Medium set) | evaluation | curve[i] = min(0.3, baseMu) |
+|---|------|----------------------|------------|------------------------------|
+| 30 | 30 | 0.0 | 0.3 | 0.0 |
+| 40 | 40 | 0.67 | 0.3 | **0.3** (clipped) |
+| 50 | 50 | 1.0 | 0.3 | **0.3** (clipped) |
+| 60 | 60 | 1.0 | 0.3 | **0.3** (clipped) |
+| 70 | 70 | 0.5 | 0.3 | **0.3** (clipped) |
+| 80 | 80 | 0.0 | 0.3 | 0.0 |
+
+**4f. Store Output:**
+```java
+ruleOutputs.put("rule_1_Medium", curve);
+```
+
+#### **Step 5: Process Rule 3**
+
+**Rule 3:** `IF TrafficDensity IS Low AND WaitingTime IS Short THEN GreenDuration IS Short`
+
+**5a. Compute Firing Strength:**
+- Condition 1: `TrafficDensity = "Low"` → `mu = 0.0`
+  - `evaluation = min(1.0, 0.0) = 0.0`
+- **Early termination:** `evaluation <= 0.0` → **Skip this rule**
+
+**Result:** Rule 3 doesn't fire, so no output curve is generated.
+
+#### **Step 6: Final Output**
+
+```java
+return {
+    "rule_0_Long": [0.0, 0.0, ..., 0.3, 0.5, 0.5, 0.5, 0.25, ..., 0.0],  // 121 values
+    "rule_1_Medium": [0.0, 0.0, ..., 0.3, 0.3, 0.3, 0.3, 0.3, ..., 0.0]  // 121 values
+}
+```
+
+---
+
+## **What Happens Next (After MamdaniEngine)**
+
+The output from MamdaniEngine goes through:
+
+1. **Aggregation** (`Aggregator.aggregateMamdani()`):
+   - Combines all rule curves using **max operation** (union)
+   - Pointwise: `aggregated[i] = max(curve1[i], curve2[i], ...)`
+   - Result: Single aggregated curve `double[121]`
+
+2. **Defuzzification** (`Defuzzifier.defuzzify()`):
+   - Converts aggregated fuzzy set to crisp value
+   - Methods: Centroid (center of mass) or Mean of Maximum
+   - Result: Final crisp output (e.g., GreenDuration = 65.3 seconds)
+
+---
+
+## **Key Concepts**
+
+### **1. Mamdani Implication**
+- Formula: `μ_output(x) = min(α, μ_consequent(x))`
+- Clips the output membership function at the firing strength level
+- Preserves the shape of the output fuzzy set but limits its height
+
+### **2. Discretization**
+- Output domain is sampled at 121 points
+- Provides sufficient resolution for accurate defuzzification
+- Step size = `(rangeEnd - rangeStart) / 120`
+
+### **3. Rule Firing Strength**
+- Determined by the **weakest** antecedent condition (minimum t-norm)
+- Represents how well the rule matches the current inputs
+- Scales the rule's contribution to the final output
+
+### **4. Curve Representation**
+- Each rule produces a discretized membership function
+- Stored as `double[121]` array
+- Represents the fuzzy output contribution of that rule
+
+---
+
+## **Mathematical Summary**
+
+For each rule \(r\):
+
+1. **Firing Strength:**
+   \[
+   \alpha_r = \min_{i=1}^{n} \mu_{A_i}(x_i) \times w_r
+   \]
+   Where:
+   - \(n\) = number of antecedent conditions
+   - \(\mu_{A_i}(x_i)\) = membership degree of condition \(i\)
+   - \(w_r\) = rule weight
+
+2. **Mamdani Implication:**
+   \[
+   \mu_r(x) = \min(\alpha_r, \mu_{B_r}(x))
+   \]
+   Where:
+   - \(\mu_{B_r}(x)\) = membership function of consequent fuzzy set
+   - \(\mu_r(x)\) = clipped output membership function
+
+3. **Output:**
+   - Discretized curve: \(\{\mu_r(x_0), \mu_r(x_1), ..., \mu_r(x_{120})\}\)
+   - Where \(x_i = \text{rangeStart} + i \times \text{step}\)
+
+---
+
+## **Code Reference**
+
+```java
+public class MamdaniEngine implements InferenceEngine {
+    private static final int NUM_SAMPLES = 121;
+
+    @Override
+    public Map<String, double[]> infer(
+            Map<String, Map<String, Double>> fuzzifiedInputs,
+            RuleBase ruleBase,
+            LinguisticVariable outputVar) {
+        
+        Map<String, double[]> ruleOutputs = new LinkedHashMap<>();
+        
+        if (ruleBase == null || ruleBase.getRules().isEmpty()) {
+            return ruleOutputs;
+        }
+        
+        double rangeStart = outputVar.getDomainMin();
+        double rangeEnd = outputVar.getDomainMax();
+        
+        if (rangeEnd <= rangeStart) {
+            throw new IllegalArgumentException("Output variable domain must have rangeEnd > rangeStart.");
+        }
+        
+        double step = (rangeEnd - rangeStart) / (NUM_SAMPLES - 1);
+        
+        int ruleIndex = 0;
+        for (FuzzyRule rule : ruleBase.getRules()) {
+            if (rule == null || !rule.isEnabled()) {
+                continue;
+            }
+            
+            RuleAntecedent antecedent = rule.getAntecedent();
+            RuleConsequent consequent = rule.getConsequent();
+            
+            if (antecedent == null || consequent == null) {
+                continue;
+            }
+            
+            double evaluation = ruleEvaluation(fuzzifiedInputs, antecedent);
+            
+            if (evaluation <= 0.0) {
+                continue;
+            }
+            
+            evaluation *= rule.getWeight();
+            
+            if (evaluation <= 0.0) {
+                continue;
+            }
+            
+            FuzzySet outputSet = outputVar.getFuzzySet(consequent.getOutputFuzzySet());
+            if (outputSet == null) {
+                continue;
+            }
+            
+            MembershipFunction mf = outputSet.getMembershipFunction();
+            
+            double[] curve = new double[NUM_SAMPLES];
+            for (int i = 0; i < NUM_SAMPLES; i++) {
+                double x = rangeStart + i * step;
+                double baseMu = mf.compute(x);
+                curve[i] = Math.min(evaluation, baseMu);
+            }
+            
+            String key = "rule_" + ruleIndex + "_" + consequent.getOutputFuzzySet();
+            ruleOutputs.put(key, curve);
+            ruleIndex++;
+        }
+        
+        return ruleOutputs;
+    }
+    
+    private double ruleEvaluation(
+            Map<String, Map<String, Double>> fuzzifiedInputs,
+            RuleAntecedent antecedent) {
+        
+        Map<String, String> conditions = antecedent.getConditions();
+        if (conditions == null || conditions.isEmpty()) {
+            return 0.0;
+        }
+        
+        double evaluation = 1.0;
+        
+        for (Map.Entry<String, String> entry : conditions.entrySet()) {
+            String varName = entry.getKey();
+            String setName = entry.getValue();
+            
+            Map<String, Double> membershipsForVar = fuzzifiedInputs.get(varName);
+            if (membershipsForVar == null) {
+                return 0.0;
+            }
+            
+            Double mu = membershipsForVar.get(setName);
+            if (mu == null) {
+                return 0.0;
+            }
+            
+            evaluation = Math.min(evaluation, mu);
+            
+            if (evaluation <= 0.0) {
+                return 0.0;
+            }
+        }
+        
+        return evaluation;
+    }
+}
+```
+
+---
+
+*Document generated from complete flow explanation of MamdaniEngine with detailed examples*
+
