@@ -9,6 +9,7 @@ public class NeuralNetwork {
     private final List<Layer> layers;
     private LossFunction loss;
     private double learningRate;
+    private java.util.List<Double> lossHistory = new java.util.ArrayList<>();
 
     public NeuralNetwork() {
         layers = new ArrayList<>();
@@ -99,4 +100,9 @@ public class NeuralNetwork {
         }
         return output;
     }
+    
+    public java.util.List<Double> getLossHistory() {
+        return lossHistory;
+    }
+
 }
