@@ -12,7 +12,7 @@ public class EnergyConsumptionMain {
     public static void main(String[] args) throws Exception {
 
         //Load raw dataset
-        double[][] rawData = CSVLoader.load("I:\\4th year\\first term\\SC\\Project\\#1\\soft-computing-library\\household_power_consumption.csv");
+        double[][] rawData = CSVLoader.load("household_power_consumption.csv");
 
         //Normalization
         MinMaxNormalizer normalizer = new MinMaxNormalizer();
