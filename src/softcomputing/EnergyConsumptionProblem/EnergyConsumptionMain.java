@@ -12,7 +12,7 @@ public class EnergyConsumptionMain {
     public static void main(String[] args) throws Exception {
 
         //Load raw dataset
-        double[][] rawData = CSVLoader.load("household_power_consumption.csv");
+        double[][] rawData = CSVLoader.load("I:\\4th year\\first term\\SC\\Project\\#1\\soft-computing-library\\household_power_consumption.csv");
 
         //Normalization
         MinMaxNormalizer normalizer = new MinMaxNormalizer();
@@ -69,5 +69,15 @@ public class EnergyConsumptionMain {
         System.out.println("Training MSE: " + trainMSE);
         System.out.println("Validation MSE: " + valMSE);
         System.out.println("Test MSE: " + testMSE);
+        double tolerance = 0.05; // example (5% of normalized scale)
+
+        double trainAcc = Metrics.toleranceAccuracy(train.y, nn.predict(train.X), tolerance);
+        double valAcc   = Metrics.toleranceAccuracy(val.y, nn.predict(val.X), tolerance);
+        double testAcc  = Metrics.toleranceAccuracy(test.y, nn.predict(test.X), tolerance);
+
+        System.out.println("Train Accuracy (±" + tolerance + "): " + trainAcc);
+        System.out.println("Val Accuracy   (±" + tolerance + "): " + valAcc);
+        System.out.println("Test Accuracy  (±" + tolerance + "): " + testAcc);
+
     }
 }

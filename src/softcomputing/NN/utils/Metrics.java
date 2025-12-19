@@ -15,5 +15,21 @@ public class Metrics {
     }
     return sum / n;
   }
+    public static double toleranceAccuracy(
+            double[][] yTrue,
+            double[][] yPred,
+            double tolerance
+    ) {
+        int correct = 0;
+        int total = yTrue.length;
+
+        for (int i = 0; i < total; i++) {
+            if (Math.abs(yPred[i][0] - yTrue[i][0]) <= tolerance) {
+                correct++;
+            }
+        }
+        return (double) correct / total;
+    }
+
 
 }
