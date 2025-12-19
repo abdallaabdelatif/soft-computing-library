@@ -1,6 +1,7 @@
 package softcomputing.EnergyConsumptionProblem;
 
 import softcomputing.NN.activation.*;
+import softcomputing.NN.config.TrainingConfig;
 import softcomputing.NN.data.*;
 import softcomputing.NN.intialization.*;
 import softcomputing.NN.layers.*;
@@ -57,8 +58,13 @@ public class EnergyConsumptionMain {
                 new XavierIntializer()
         ));
 
-        //Training
-        nn.fit(train.X, train.y, 50, 32);
+        // Training configuration
+        TrainingConfig config = new TrainingConfig(50, 0.01, 32);
+        nn.setLearningRate(config.learningRate);
+        nn.setLoss(new MeanSquaredError());
+
+        // Training with config
+        nn.fit(train.X, train.y, config.epochs, config.batchSize);
 
         //Evaluation
         double trainMSE = Metrics.mse(train.y, nn.predict(train.X));

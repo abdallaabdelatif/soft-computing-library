@@ -3,6 +3,7 @@ package softcomputing.NN.layers;
 import java.util.ArrayList;
 import java.util.List;
 import softcomputing.NN.losses.LossFunction;
+import softcomputing.NN.utils.ValidationUtils;
 
 public class NeuralNetwork {
 
@@ -40,7 +41,7 @@ public class NeuralNetwork {
 
     public void fit(double[][] X, double[][] y, int epochs, int batchSize) {
 
-        validateInputs(X, y);
+        ValidationUtils.validateInputs(X, y); 
         int n = X.length;
         for (int epoch = 0; epoch < epochs; epoch++) {
             // Shuffle indices
@@ -113,10 +114,5 @@ public class NeuralNetwork {
     public java.util.List<Double> getLossHistory() {
         return lossHistory;
     }
-    private void validateInputs(double[][] X, double[][] y) {
-        if (X == null || y == null) throw new IllegalArgumentException("Input or labels are null");
-        if (X.length != y.length) throw new IllegalArgumentException("Mismatched sample sizes");
-        if (X.length == 0) throw new IllegalArgumentException("Empty dataset");
-   }
-
+    
 }

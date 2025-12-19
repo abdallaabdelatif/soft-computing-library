@@ -43,6 +43,4 @@ private static void shuffle(int[] array) {
         array[j] = temp;
     }
 }
-
-
 }

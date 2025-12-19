@@ -1,7 +1,7 @@
 package softcomputing.NN.config;
 
 public class TrainingConfig {
-    public int epochs = 200;
+    public int epochs = 50;
     public double learningRate = 0.01;
     public int batchSize = 32;
 
