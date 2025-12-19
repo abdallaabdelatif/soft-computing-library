@@ -13,7 +13,7 @@ public class NeuralNetwork {
 
     public NeuralNetwork() {
         layers = new ArrayList<>();
-        learningRate = 0.01;
+        learningRate = softcomputing.NN.config.DefaultConfig.LEARNING_RATE;
     }
 
     public void addLayer(Layer layer) {
@@ -28,7 +28,19 @@ public class NeuralNetwork {
         this.learningRate = lr;
     }
 
+    public List<double[][]> getLayerOutputs(double[][] X) {
+        List<double[][]> outputs = new ArrayList<>();
+        double[][] current = X;
+        for (Layer layer : layers) {
+            current = layer.forward(current);
+            outputs.add(current);
+        }
+        return outputs;
+   }
+
     public void fit(double[][] X, double[][] y, int epochs, int batchSize) {
+
+        validateInputs(X, y);
         int n = X.length;
         for (int epoch = 0; epoch < epochs; epoch++) {
             // Shuffle indices
@@ -91,9 +103,20 @@ public class NeuralNetwork {
         }
         return output;
     }
-    
+    public double[] predictSingle(double[] input) {
+        double[][] batch = new double[1][input.length];
+        batch[0] = input;
+        double[][] output = predict(batch);
+        return output[0];
+    }
+
     public java.util.List<Double> getLossHistory() {
         return lossHistory;
     }
+    private void validateInputs(double[][] X, double[][] y) {
+        if (X == null || y == null) throw new IllegalArgumentException("Input or labels are null");
+        if (X.length != y.length) throw new IllegalArgumentException("Mismatched sample sizes");
+        if (X.length == 0) throw new IllegalArgumentException("Empty dataset");
+   }
 
 }

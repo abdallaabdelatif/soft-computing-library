@@ -41,7 +41,6 @@ public class DenseLayer implements Layer {
 
     @Override
     public double[][] backward(double[][] gradOutput, double learningRate) {
-
         double[][] gradZ = new double[zCache.length][zCache[0].length];
         for (int i = 0; i < zCache.length; i++) {
             for (int j = 0; j < zCache[0].length; j++) {
@@ -52,11 +51,17 @@ public class DenseLayer implements Layer {
         double[][] gradW = Matrix.multiply(Matrix.transpose(inputCache), gradZ);
         double[] gradB = Matrix.sumRows(gradZ);
 
+        // store old weights before update
+        double[][] oldWeights = weights;
+
+        // update
         weights = Matrix.subtract(weights, Matrix.scalarMultiply(gradW, learningRate));
         bias = Matrix.subtract(bias, Matrix.scalarMultiply(gradB, learningRate));
 
-        return Matrix.multiply(gradZ, Matrix.transpose(weights));
-    }
+        // gradInput uses old weights
+        return Matrix.multiply(gradZ, Matrix.transpose(oldWeights));
+   }
+
 
     public double[][] getLastZ() {
         return zCache;
